@@ -1,7 +1,6 @@
 #pragma once
 
 //#define USE_DB
-
 #ifdef USE_DB
 
 #include <cstdio>
@@ -12,7 +11,7 @@
 #include <atlstr.h>
 
 
-//#include <mysqlx/xdevapi.h>
+#include <mysqlx/xdevapi.h>
 //using namespace ::mysqlx;
 
 
