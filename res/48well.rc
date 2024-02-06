@@ -1,0 +1,537 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "48well.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "Toolbar.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    BUTTON      ID_APP_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENUEX
+BEGIN
+    POPUP "File",                           65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "&Save",                       ID_FILE_SAVE,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "Print Setup...",              ID_FILE_PRINT_SETUP,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1,MFT_STRING,MFS_GRAYED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "View",                           65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR,MFT_STRING,MFS_ENABLED
+        MENUITEM "&ROI Preview\tCtrl+R",        ID_VIEW_ROIPREVIEW,MFT_STRING,MFS_ENABLED
+        MENUITEM "Pole Positions",              ID_VIEW_POLE,MFT_STRING,MFS_ENABLED
+        MENUITEM "Method2 Area",                ID_VIEW_TAG,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "No Trap Mouse",               ID_VIEW_NO_TRAP,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Help",                           65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "&About demo...",              ID_APP_ABOUT,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Measurement",                    65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "Start Measurement",           ID_START_MEASUREMENT,MFT_STRING,MFS_ENABLED
+        MENUITEM "Stop Measurement",            ID_STOP_MEASUREMENT,MFT_STRING,MFS_GRAYED
+        MENUITEM "Use Method2",                 ID_USE_NEW_MED,MFT_STRING,MFS_ENABLED
+        MENUITEM "Re-&Calculate",               ID_RE_CAL,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Parameter",                      65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "Edit Parameter",              ID_PARAMETER_EDITPARAMETER,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Camera",                         65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "start",                       ID_CAMERA_START,MFT_STRING,MFS_ENABLED
+        MENUITEM "stop",                        ID_CAMERA_STOP,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Stimulation",                    65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "On\tCtrl+S",                  ID_STIMULATION_ON,MFT_STRING,MFS_ENABLED
+        MENUITEM "Off\tCtrl+s",                 ID_STIMULATION_OFF,MFT_STRING,MFS_ENABLED
+        MENUITEM "Perm\tCtrl+P",                ID_STIMULATION_PERM,MFT_STRING | MFT_MENUBREAK,MFS_ENABLED
+        MENUITEM "&X On\tCtrl+X",               ID_STIMULATION_X_ON,MFT_STRING,MFS_ENABLED
+        MENUITEM "&x off\tCtrl+x",              ID_STIMULATION_X_OFF,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR_500\tCtrl+500",            ID_RR_500,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR_666",                      ID_RR_666,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR_750",                      ID_RR_750,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR intervall r=1000 1Hz",     ID_RR_1000,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR_1333",                     ID_RR_1333,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR intervall r=1500ms",       ID_RR_1500,MFT_STRING,MFS_ENABLED
+        MENUITEM "RR intervall r=32 sec",       ID_RR_32000,MFT_STRING,MFS_ENABLED
+        MENUITEM "# Pulses per Stim N=160",     ID_STIMULATION_N160,MFT_STRING,MFS_ENABLED
+        MENUITEM "# Pulses per Stim N=1",       ID_STIMULATION_N1,MFT_STRING,MFS_ENABLED
+        MENUITEM "# Pulses per Stim N=5",       ID_STIMULATION_N5,MFT_STRING,MFS_ENABLED
+        MENUITEM "Pulse Width W=1ms",           ID_STIMULATION_W1,MFT_STRING,MFS_ENABLED
+    END
+    POPUP "Light",                          65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "On\tCtrl+U",                  ID_LIGHT_ON,MFT_STRING,MFS_ENABLED
+        MENUITEM "flash\tCtrl+F",               ID_LIGHT_FLASH,MFT_STRING | MFT_RIGHTORDER,MFS_ENABLED
+        MENUITEM "Off\tCtrl+u",                 ID_LIGHT_OFF,MFT_STRING | MFT_RIGHTORDER,MFS_ENABLED
+    END
+    POPUP "Ext.Trigger",                    65535,MFT_STRING,MFS_ENABLED
+    BEGIN
+        MENUITEM "On\tCtrl+T",                  ID_TRIGGER_ON,MFT_STRING,MFS_ENABLED
+        MENUITEM "Off\tCtrl+t",                 ID_TRIGGER_OFF,MFT_STRING,MFS_ENABLED
+    END
+    MENUITEM MFT_SEPARATOR
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "R",            ID_VIEW_ROIPREVIEW,     VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 217, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About demo"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,21,15,20,20
+    LTEXT           "FOC48  Version 1.1",IDC_STATIC,134,9,74,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) Bao&Tim 2021",IDC_STATIC,111,28,94,8
+END
+
+IDD_SAVEDIAL DIALOGEX 100, 20, 399, 232
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Save"
+FONT 12, "Microsoft Sans Serif", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Save 120 sec",ID_SAVE_range,321,109,60,31
+    PUSHBUTTON      "Cancel",IDCANCEL,321,14,60,24
+    LTEXT           "Measurement",IDC_STATIC,219,2,45,8
+    CTEXT           "C:/Labhub/FOC48",IDC_SAVEPATH,4,201,290,10,SS_NOTIFY | WS_BORDER
+    LISTBOX         IDC_EXP_LIST,3,12,156,182,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add Exp",ID_Add_Experiment,321,74,60,28
+    LTEXT           "Experiment",IDC_STATIC,63,2,37,8
+    PUSHBUTTON      "Edit Meas",ID_EDIT_MEA,320,41,60,29
+    LISTBOX         IDC_MEA_LIST,168,12,139,183,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "Save All",ID_SAVE_ALL,321,145,60,31
+    CTEXT           "",IDC_SUFFIX,299,202,88,10,SS_NOTIFY | WS_BORDER
+    CONTROL         "autoClose",IDC_AUTOCLOSE,"Button",BS_AUTOCHECKBOX | BS_CENTER | WS_TABSTOP,325,183,53,15
+END
+
+IDD_Add_ID DIALOGEX 100, 20, 393, 86
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Save"
+FONT 12, "Microsoft Sans Serif", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,120,3,60,18
+    PUSHBUTTON      "Cancel",IDCANCEL,190,4,60,18
+    PUSHBUTTON      "2022",IDC_BUTTON_2021,10,28,24,18
+    PUSHBUTTON      "2023",IDC_BUTTON_2022,10,48,24,18
+    PUSHBUTTON      "2024",IDC_BUTTON_2023,10,67,24,18
+    PUSHBUTTON      "1",IDC_BUTTON_m1,43,28,24,18
+    PUSHBUTTON      "2",IDC_BUTTON_m2,68,28,24,18
+    PUSHBUTTON      "3",IDC_BUTTON_m3,93,28,24,18
+    PUSHBUTTON      "4",IDC_BUTTON_m4,118,28,24,18
+    PUSHBUTTON      "5",IDC_BUTTON_m5,43,48,24,18
+    PUSHBUTTON      "6",IDC_BUTTON_m6,68,48,24,18
+    PUSHBUTTON      "7",IDC_BUTTON_m7,93,48,24,18
+    PUSHBUTTON      "8",IDC_BUTTON_m8,118,48,24,18
+    PUSHBUTTON      "9",IDC_BUTTON_m9,43,67,24,18
+    PUSHBUTTON      "10",IDC_BUTTON_m10,68,67,24,18
+    PUSHBUTTON      "11",IDC_BUTTON_m11,93,67,24,18
+    PUSHBUTTON      "12",IDC_BUTTON_m12,118,67,24,18
+    PUSHBUTTON      "10",IDC_BUTTON_d10,151,28,24,18
+    PUSHBUTTON      "20",IDC_BUTTON_d20,151,48,24,18
+    PUSHBUTTON      "30",IDC_BUTTON_d30,151,67,24,18
+    PUSHBUTTON      "1",IDC_BUTTON_d1,179,28,24,18
+    PUSHBUTTON      "2",IDC_BUTTON_d2,204,28,24,18
+    PUSHBUTTON      "3",IDC_BUTTON_d3,229,28,24,18
+    PUSHBUTTON      "4",IDC_BUTTON_d4,179,48,24,18
+    PUSHBUTTON      "5",IDC_BUTTON_d5,204,48,24,18
+    PUSHBUTTON      "6",IDC_BUTTON_d6,229,48,24,18
+    PUSHBUTTON      "7",IDC_BUTTON_d7,179,67,24,18
+    PUSHBUTTON      "8",IDC_BUTTON_d8,204,67,24,18
+    PUSHBUTTON      "9",IDC_BUTTON_d9,229,67,24,18
+    PUSHBUTTON      "a",IDC_BUTTON_A,259,28,24,18
+    PUSHBUTTON      "b",IDC_BUTTON_B,284,28,24,18
+    PUSHBUTTON      "c",IDC_BUTTON_C,309,28,24,18
+    PUSHBUTTON      "d",IDC_BUTTON_D,334,28,24,18
+    PUSHBUTTON      "e",IDC_BUTTON_E,359,28,24,18
+    PUSHBUTTON      "f",IDC_BUTTON_F,259,48,24,18
+    PUSHBUTTON      "g",IDC_BUTTON_G,284,48,24,18
+    PUSHBUTTON      "h",IDC_BUTTON_H,309,48,24,18
+    PUSHBUTTON      "i",IDC_BUTTON_I,334,48,24,18
+    PUSHBUTTON      "j",IDC_BUTTON_J,359,48,24,18
+    PUSHBUTTON      "k",IDC_BUTTON_K,259,67,24,18
+    PUSHBUTTON      "l",IDC_BUTTON_L,284,67,24,18
+    PUSHBUTTON      "m",IDC_BUTTON_M,309,67,24,18
+    PUSHBUTTON      "n",IDC_BUTTON_N,334,67,24,18
+    PUSHBUTTON      "x",IDC_BUTTON_X,359,67,24,18
+    CTEXT           "YYYYMMDDb",IDC_MEASUREMENT,8,7,60,12,SS_NOTIFY | WS_BORDER
+    PUSHBUTTON      "2022",IDC_BUTTON_THIS,10,48,24,18
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "48well Analysis App"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "demo"
+            VALUE "LegalCopyright", "Copyright (C) 1998"
+            VALUE "OriginalFilename", "48well.EXE"
+            VALUE "ProductName", "48well Analysis App"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+    END
+
+    IDD_SAVEDIAL, DIALOG
+    BEGIN
+        RIGHTMARGIN, 387
+        BOTTOMMARGIN, 223
+    END
+
+    IDD_Add_ID, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 85
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SAVEDIAL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_Add_ID AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "FOC48"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "48 well"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+#endif    // Englisch (USA) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
