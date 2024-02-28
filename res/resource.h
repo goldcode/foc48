@@ -29,13 +29,9 @@
 #define IDC_SAVEPATH2                   2002
 #define IDC_SUFFIX                      2002
 #define IDC_MEASUREMENT                 2003
-#define IDC_BUTTON2019                  2011
-#define IDC_BUTTON_2021                 2011
-#define IDC_BUTTON2020                  2012
-#define IDC_BUTTON_2022                 2012
-#define IDC_BUTTON2021                  2013
+#define IDC_BUTTON_LAST                 2011
+#define IDC_BUTTON_THIS                 2012
 #define IDC_BUTTON_NEXT                 2013
-#define IDC_BUTTON_2023                 2013
 #define IDC_BUTTON_m1                   2021
 #define IDC_BUTTON_m2                   2022
 #define IDC_BUTTON_m3                   2023
@@ -76,7 +72,6 @@
 #define IDC_BUTTON_N                    2074
 #define IDC_BUTTON_O                    2075
 #define IDC_BUTTON_X                    2075
-#define IDC_BUTTON_THIS                 2099
 #define ID_PARAMETER_EDITPARAMETER      32774
 #define ID_MEASUREMENT_START            32775
 #define ID_MEASUREMENT_STOP             32776

@@ -17,7 +17,9 @@ public:
 // Dialog Data
 	enum { IDD = IDD_Add_ID };
 
-	CString Year  = L"2020";
+	CTime time = CTime::GetCurrentTime();
+
+	CString Year  = L"2024";
 	CString Month = L"01";
 	CString Day10 = L"0";
 	CString Day1  = L"1";
@@ -28,6 +30,9 @@ public:
 	afx_msg void OnBnClickedDay10(UINT unID);
 	afx_msg void OnBnClickedDay1(UINT unID);
 	afx_msg void OnBnClickedIndex(UINT unID);
+
+	virtual BOOL OnInitDialog();
+
 
 	void UpdateWindow();
 

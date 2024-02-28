@@ -13,10 +13,34 @@
 
 IMPLEMENT_DYNAMIC(GenIdWn, CDialogEx)
 
-GenIdWn::GenIdWn(CWnd* pParent /*=NULL*/)
-	: CDialogEx(GenIdWn::IDD, pParent)
+GenIdWn::GenIdWn(CWnd* pParent /*=NULL*/)	: CDialogEx(GenIdWn::IDD, pParent)
 {
+	
+}
 
+BOOL GenIdWn::OnInitDialog() 
+{
+	BOOL bResult = CDialogEx::OnInitDialog(); 
+	
+	CString str;
+	CWnd* pButton;
+	//	
+	Year.Format(L"%d", time.GetYear());
+	//UPDATE Buttons
+	
+	str.Format(L"%d", time.GetYear() - 1);
+
+	pButton = GetDlgItem(IDC_BUTTON_LAST);
+	pButton->SetWindowTextW(str);
+
+	pButton = GetDlgItem(IDC_BUTTON_THIS);
+	pButton->SetWindowTextW(Year);
+
+	str.Format(L"%d", time.GetYear() + 1);
+	pButton = GetDlgItem(IDC_BUTTON_NEXT);
+	pButton->SetWindowTextW(str);
+
+	return bResult;
 }
 
 GenIdWn::~GenIdWn()
@@ -30,13 +54,13 @@ void GenIdWn::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(GenIdWn, CDialogEx)
-	//ON_COMMAND_RANGE(IDC_BUTTON_LAST, IDC_BUTTON_LAST, GenIdWn::OnBnClickedYear)
-	ON_COMMAND_RANGE(IDC_BUTTON_THIS, IDC_BUTTON_THIS, GenIdWn::OnBnClickedYear)
-	ON_COMMAND_RANGE(IDC_BUTTON_NEXT, IDC_BUTTON_NEXT, GenIdWn::OnBnClickedYear)
-	ON_COMMAND_RANGE(IDC_BUTTON_m1, IDC_BUTTON_m12, GenIdWn::OnBnClickedMonth)
-	ON_COMMAND_RANGE(IDC_BUTTON_d10, IDC_BUTTON_d30, GenIdWn::OnBnClickedDay10)
-	ON_COMMAND_RANGE(IDC_BUTTON_d1, IDC_BUTTON_d9, GenIdWn::OnBnClickedDay1)
-	ON_COMMAND_RANGE(IDC_BUTTON_A, IDC_BUTTON_O, GenIdWn::OnBnClickedIndex)	
+	ON_COMMAND_RANGE(IDC_BUTTON_LAST,   IDC_BUTTON_LAST, GenIdWn::OnBnClickedYear)
+	ON_COMMAND_RANGE(IDC_BUTTON_THIS,   IDC_BUTTON_THIS, GenIdWn::OnBnClickedYear)
+	ON_COMMAND_RANGE(IDC_BUTTON_NEXT,   IDC_BUTTON_NEXT, GenIdWn::OnBnClickedYear)
+	ON_COMMAND_RANGE(IDC_BUTTON_m1,     IDC_BUTTON_m12, GenIdWn::OnBnClickedMonth)
+	ON_COMMAND_RANGE(IDC_BUTTON_d10,    IDC_BUTTON_d30, GenIdWn::OnBnClickedDay10)
+	ON_COMMAND_RANGE(IDC_BUTTON_d1,     IDC_BUTTON_d9, GenIdWn::OnBnClickedDay1)
+	ON_COMMAND_RANGE(IDC_BUTTON_A,      IDC_BUTTON_O, GenIdWn::OnBnClickedIndex)	
 END_MESSAGE_MAP()
 
 

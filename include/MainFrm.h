@@ -341,6 +341,7 @@ public:
 
 	CString meaName;
 	CString expName;
+	CString expYear;
 	CString filePath, rootName;
 
 	bool bFilePathSet = false;

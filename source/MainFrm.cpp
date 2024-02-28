@@ -746,6 +746,7 @@ bool CMainFrame::Save(bool bInteractive)
 		int ret = (int)saveDlg.DoModal();
 
 		if (ret == IDOK) {
+			expYear = saveDlg.ExpName();
 			expName = saveDlg.ExpName();
 			meaName = saveDlg.MeaName();
 			filePath = saveDlg.FilePath();
