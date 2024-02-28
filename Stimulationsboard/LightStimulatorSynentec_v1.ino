@@ -7,15 +7,6 @@ unsigned int iRow = 0;
 char deviceName[]="LightStimulator";
 char deviceVersion[]="30";
 
-//Boards Produced:
-// 1: eStim 
-// 2: eStim inverted               Stimulationsboard_Arduino_V5.7 UV an PB0
-// 3: light Stim with micro switch Stimulationboard_Light_V3.0    UV an PD4
-// 4: light Stim with Trigger      Stimulationboard_Light_trig    UV an PD4
-// 5: light Stim with Trigger      Landscape Format, 6 Trig Groups
-// 6: light Stim with Trigger      Landscape Format, MyrVersion Trigger on pin 20
-
-
 unsigned long uvFlash=8000; //uv Flash Duration in us
 unsigned long long now;
 unsigned long long last;
@@ -51,11 +42,13 @@ unsigned long long pulseOffTimer[]  = {   1,    1,    1,    1,    1,    1};
 unsigned char pinPos[]             = { 0b01000000,0b00010000,0b01000000,0b10000000,0b01000000,0b00010000};
 volatile unsigned char * portPos[] = {  &PORTD,     &PORTB,    &PORTB,    &PORTC,    &PORTF,    &PORTF};
 volatile unsigned char *  dirPos[] = {  &DDRD,      &DDRB,     &DDRB,     &DDRC,     &DDRF,     &DDRF};
-//                                       PB0
-unsigned char pinTrig              = 0b00000001;
-unsigned char intTrig              =    0;          //trigger interrupt
-volatile unsigned char *  portTrig =   &PORTB;
-volatile unsigned char *   dirTrig =    &DDRB;
+
+//                                       PD2
+unsigned char pinTrig              = 0b00000010;
+unsigned char intTrig              =    2;          //trigger interrupt
+volatile unsigned char *  portTrig =   &PORTD;
+volatile unsigned char *   dirTrig =   &DDRD;
+volatile unsigned char *    portIn =   &PIND;
 
 //                                       PD4
 unsigned char pinUV                = 0b00010000;
@@ -69,7 +62,7 @@ volatile unsigned char *  dirUV    =    &DDRD;
 
 int bLight      = false;
 int bFlash      = false;
-int bStimulate  = true;
+int bStimulate  = false;
 int bPermanent  = false;
 int bSequential = false;
 int bExtTrig    = false;
@@ -93,7 +86,8 @@ int stimPinOffState=HIGH;
 void lightOn(void);
 //void lightOff(void);
 
-int trigPin = 8;  //PD1=D2
+
+
 
 void setTimer() {  
   Serial.println("set Timer");
@@ -119,7 +113,9 @@ void setup() {
   now=micros();
   Serial.begin(9600);
   bSequential=0;      
-  //set pin input
+  /*
+   * set pin input
+   */
   *dirTrig  &=  ~pinTrig;
   //set trigger pin high (Pullup)
   *portTrig |= pinTrig;  
@@ -136,12 +132,15 @@ void setup() {
   lightOff();
   setTimer();
   iterationTimer=now;
-  iterationCounter=0;  
+  iterationCounter=0;
+  if (! bStimulate){
+      stimSwitchOff();
+  }
+    
 }
 
 void getTrigger() {
-  Serial.print('t');
-  if (digitalRead(trigPin)){ //RISING
+  if ( (*portIn & pinTrig) != 0   ){
       if (bFlash){
         sendUvFlash();
       }
@@ -270,6 +269,40 @@ void printLongLong(uint64_t n){
     }//while
   Serial.println(result);
 }
+void readSerial(MY_CMD cc);
+
+void loop() {
+  //  
+  last=now;
+  now=micros();
+  // work-around for micros overflow issue (every 70mins)
+  if (last > now)
+    setTimer();  
+  //
+  iterationCounter++;
+  //
+  if (bUvAuto && now > uvOffTime)
+    lightSwitchOff();
+  //
+  if (bLight) {
+    lightOn();
+  } else {
+    lightOff();
+  }
+  //
+  if (! bExtTrig  && bStimulate)
+      startPulse();
+  // in case pulse start is triggered externally check if is due stopping
+  if (! bPermanent)
+      stopPulse();
+  //
+  if (Serial.available() > 0){
+    MY_CMD cc;
+    myGET_CMD(cc);
+    readSerial(cc);
+  }  
+}
+
 
 void readSerial(MY_CMD cc){
   //         
@@ -478,8 +511,7 @@ void readSerial(MY_CMD cc){
         //use internal Trigger
         break;
       case 'T':        
-        Serial.print("External Trigger On auf pin  ");
-        Serial.println(trigPin);
+        Serial.println("External Trigger On");
         bExtTrig=true;
         break;
       case 'u' :        
@@ -528,36 +560,4 @@ void readSerial(MY_CMD cc){
         break;      
       default:;
   }
-}
-
-void loop() {
-  //  
-  last=now;
-  now=micros();
-  // work-around for micros overflow issue (every 70mins)
-  if (last > now)
-    setTimer();  
-  //
-  iterationCounter++;
-  //
-  if (bUvAuto && now > uvOffTime)
-    lightSwitchOff();
-  //
-  if (bLight) {
-    lightOn();
-  } else {
-    lightOff();
-  }
-  //
-  if (! bExtTrig  && bStimulate)
-      startPulse();
-  // in case pulse start is triggered externally check if is due stopping
-  if (! bPermanent)
-      stopPulse();
-  //
-  if (Serial.available() > 0){
-    MY_CMD cc;
-    myGET_CMD(cc);
-    readSerial(cc);
-  }  
 }
