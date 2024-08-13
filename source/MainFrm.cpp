@@ -1,23 +1,6 @@
-// MainFrm.cpp : implementation of the CMainFrame class
-//
-
-//#include "stdafx.h"
-//#include <afx.h>
-
-
-//#include <iostream>
-//#include <fstream>
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#include <afxdialogex.h>
-
 #include "MainFrm.h"
 #include "48well.h"		// //#include <afxext.h>         // MFC extensions
 #include "SaveDialogWn.h"
-//#include "SerialPort.h"
-
-// #include "comList.h"
-//#include "USBstimulationBoard.h"
 
 #include "myHelper.h"
 #include "DBG_print.h"
@@ -27,15 +10,15 @@
 
 #include "myEHM_FIT_M_01.h"
 
-//#include "mySerial.h"
-//#include "SerialClass.h"
-//#include "..\libXML\libXML\libXML.h"
-//#pragma comment(lib,"..\\libXML\\release\\libXMLw32.lib")
+
 
 #ifndef MY_NO_pylon
+
 using namespace GenApi;
 using namespace Basler_UsbCameraParams;
+
 #endif
+
 // Namespace for using cout.
 using namespace std;
 
@@ -95,7 +78,9 @@ public:
 };
 #else
 
+
 #include "my_ssAVI.h"
+
 myMEMFR	*mFF2 = NULL;
 
 #endif
@@ -138,7 +123,8 @@ CMainFrame::CMainFrame(CWinApp *p)
 
 #else
 	if (mFF2 == NULL)
-		mFF2 = new myMEMFR("C:\\labhub\\FIT_TEST\\MY_MEM_DATA.tmp");
+		//mFF2 = new myMEMFR("C:\\Labhub\\Import\\myrPlate_Video.bin");
+		mFF2 = new myMEMFR( CStringA(parameters.VideoFile()) );
 #endif
 	nWell = nRowCount*nColCount;
 	m_trace=NULL;
@@ -395,7 +381,8 @@ void CMainFrame::StartMeasurement()
 	//stimulationBoard.setUV(1);	// no need, StartCamera() has setUV
 	//m_camera->AcquisitionMode.SetValue(AcquisitionMode_Continuous);
 	//m_camera->AcquisitionStart.Execute();
-	StartCamera(); // has -> stimulationBoard.setUV(1, bUvFlash); 
+	StartCamera(); 
+	// has -> stimulationBoard.setUV(1, bUvFlash); 
 	//
 	bMeasuring = true;
 	measurementStartTime = (double) clock() / CLOCKS_PER_SEC;
@@ -411,12 +398,15 @@ void CMainFrame::StopMeasurement()
 	//
 	measurementStartTime = measurementStartTime + measurementInterval;
 	//
+#ifndef MY_NO_pylon
 	StopCamera();
-	//	m_camera->Close();
+#endif
 	//
 	printf("ShutDown UV\n");
 	//setTimer
+#ifndef MY_NO_USB
 	stimulationBoard.setUV(0);
+#endif
 	//
 	//SetStimulationBoardStatus(L"b");
 	KillTimer(measurementStopTimer);
@@ -434,30 +424,20 @@ void CMainFrame::StopMeasurement()
 
 void CMainFrame::mySetTimer()
 {
-	SetTimer(checkFrameTimer,		checkFrameInterval,					myCheckFrame);
-	SetTimer(updateScreenTimer,		(int)updateScreenInterval,			myUpdateScreen);
+	SetTimer(checkFrameTimer,		checkFrameInterval,			 myCheckFrame);
+	SetTimer(updateScreenTimer,		(int)updateScreenInterval,	 myUpdateScreen);
+	SetTimer(switchScreenTimer,     (int)switchScreenInterval,   mySwitchScreen); 
+	
 	SetTimer(measurementStartTimer, (int)(measurementInterval * 1000),	myStartMeasurement);
+	
+
+
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
-	//// create a view to occupy the client area of the frame
-	//if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW, CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL))
-	//{
-	//	TRACE0("Failed to create view window\n");
-	//	return -1;
-	//}
-
- //   //Create ToolBar
-	//if (!m_wndToolBar.Create(this) ||
-	//	!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
-	//{
-	//	TRACE0("Failed to create toolbar\n");
-	//	return -1;      // fail to create
-	//}
 
 	if (!m_wndStatusBar.Create(this))
 	{
@@ -489,13 +469,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-//#define vTimer2_TICK	48
-
-//MK_CONTROL Set if the CTRL key is down.
-//MK_LBUTTON Set if the left mouse button is down.
-//MK_MBUTTON Set if the middle mouse button is down.
-//MK_RBUTTON Set if the right mouse button is down.
-//MK_SHIFT Set if the SHIFT key is down.
 
 afx_msg void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -526,6 +499,7 @@ afx_msg void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 #define MY_LButtonDown		0x01
 #define MY_RButtonDown		0x02
 #define MY_MButtonDown		0x010
+
 wchar_t * __fastcall myMOUSEKEY(int nFlags, wchar_t *wSTin = NULL)
 {
 	wchar_t wST[10] = { L'L', L' ', L' ', L'M', L' ', L' ', L'R', L' ', L' ', 0 };
@@ -2104,6 +2078,7 @@ bool CMainFrame::InitCamera()
 			}
 		}
 		else {
+			//if camera is set to global then lower lines will appear brighter
 			bFlashTrigger = false;
 			m_camera->ShutterMode.SetValue(ShutterMode_Rolling);
 		}
@@ -2341,6 +2316,12 @@ VOID CALLBACK myUpdateScreen(HWND hwnd, UINT message, unsigned long long idTimer
 	theApp.pMainFrame->updateScreen();
 }
 
+VOID CALLBACK mySwitchScreen(HWND hwnd, UINT message, unsigned long long idTimer, DWORD dwTime)
+{
+	theApp.pMainFrame->OnLButtonDown(0, CPoint(10,10));
+}
+
+
 void CMainFrame::updateScreen()
 {
 	currTime = (double)clock() / CLOCKS_PER_SEC;
@@ -2398,13 +2379,12 @@ void CMainFrame::importParameters()
 
 	myPreSetMenu(parameters.get_mySet_mskEHM());
 
-#ifdef USE_DB
-	Db.host.host = parameters.DbHost();   //url or IP to Database
-	Db.host.port = parameters.DbPort();   //database Port e.g. 3306
-	Db.host.name = parameters.DbName();   //database Name e.g. contractionDb
-	Db.host.user = parameters.DbUser();   //database Username with write priviledges tp forces table
-	Db.host.pass = parameters.DbPass();   //database password, TDO: store secretely:)
-#endif
+	//Db.host.host = parameters.DbHost();   //url or IP to Database
+	//Db.host.port = parameters.DbPort();   //database Port e.g. 3306
+	//Db.host.name = parameters.DbName();   //database Name e.g. contractionDb
+	//Db.host.user = parameters.DbUser();   //database Username with write priviledges tp forces table
+	//Db.host.pass = parameters.DbPass();   //database password, TDO: store secretely:)
+
 }
 
 int nFF = 0;
@@ -2623,31 +2603,6 @@ void CMainFrame::UpdateView()
 	}
 }
 
-//void CMainFrame::OnUpdatePane(CCmdUI* pCmdUI)
-//{
-//	pCmdUI->Enable(); // default is TRUE
-//}
-
-/////////////////////////////////////////////////////////////////////////////
-// CDemoView drawing
-
-//void CMainFrame::OnDraw(CDC* pDC)		// this is called by internal OnPaint
-//{
-//	//CDemoDoc* pDoc = GetDocument();  // AAA seems no use
-//
-//	//CFrameWnd::OnDraw
-//}
-
-//BOOL CMainFrame::OnEraseBkgnd(CDC* pDC){
-//	return TRUE;
-//}
-
-//void CMainFrame::OnPaint(){
-//	//CFrameWnd::OnPaint();
-//CPaintDC dc(this);
-//OnPrepareDC(&dc);
-//OnDraw(&dc);
-//}
 
 #define SC_MAXIMIZE2		0xF032	// when double click on the title bar
 #define SC_RESTORE2			0xF122

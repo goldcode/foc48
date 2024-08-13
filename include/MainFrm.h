@@ -21,7 +21,10 @@ class myPlot;
 #include "USBstimulationBoard.h"
 
 // Following line is used for computer that has no pylon installed, to use a memory recorded file.
-//#define MY_NO_pylon
+
+#define MY_NO_pylon
+#define MY_NO_USB
+#define MY_NO_DB
 
 // Following line is for memory recorded files.
 //#define USE_MY_MEM_FILE	1
@@ -40,7 +43,6 @@ using namespace Pylon;
 using namespace Basler_UsbCameraParams;
 using namespace Basler_UsbStreamParams;
 
-#else
 
 #endif // MY_NO_pylon
 
@@ -60,6 +62,7 @@ VOID CALLBACK myCheckFrame		(HWND hwnd, UINT message, unsigned long long idTimer
 VOID CALLBACK myStartMeasurement(HWND hwnd, UINT message, unsigned long long idTimer, DWORD dwTime);
 VOID CALLBACK myStopMeasurement	(HWND hwnd, UINT message, unsigned long long idTimer, DWORD dwTime);
 VOID CALLBACK myUpdateScreen	(HWND hwnd, UINT message, unsigned long long idTimer, DWORD dwTime);
+VOID CALLBACK mySwitchScreen    (HWND hwnd, UINT message, unsigned long long idTimer, DWORD dwTime);
 
 #define	MY_SHOW_OBJ_KASK	0x00000001
 #define	MY_CAL_MASK			0x00000010		// re-calculate
@@ -159,6 +162,8 @@ public:
 	int checkFrameInterval = 3;     //Data   Analysis in ms
 	static const int updateScreenInterval = 500;   //Update Screen in  ms
 
+	static const int switchScreenInterval = 10000;   //Update Screen in  ms
+
 	int  iMeasurement  = 1;
 	int  nMeasurement  = 1;
 	bool bMeasuring    = false;
@@ -170,11 +175,12 @@ public:
 	bool bStimulate = false;
 	int  rrVal    = 0;	// rr is too simple that will conflict with others
 
-	static const int checkFrameTimer = 701;
-	static const int updateScreenTimer = 702;
-	static const int measurementStartTimer = 703;
-	static const int measurementStopTimer = 704;
-	static const int ID_WAITDLG = 705;
+	static const int checkFrameTimer       = 701;
+	static const int updateScreenTimer     = 702;
+	static const int switchScreenTimer     = 703;
+	static const int measurementStartTimer = 704;
+	static const int measurementStopTimer  = 705;
+	static const int ID_WAITDLG            = 706;
 
 
 	//class CProgressCtrl pWaitBar;
@@ -306,9 +312,7 @@ public:
 	bool addFrameBuffer(const unsigned char *pBuf);
 #endif
 	
-#ifdef USE_DB
 	contractionDB Db;
-#endif
 
 	double xGrid_mm =18.0;
 	double pix2mm   =0.0;

@@ -116,6 +116,8 @@ private:
 
 	CString outFileVar = L"FOC_OUTFILE";
 
+	CString videoFile  = L"C:\\Labhub\\Import\\myrPlate_Video.bin";
+
 	CString exportPath = L"C:\\Labhub\\FOC48_DATA";
 
 	CString suffix = L"";
@@ -152,7 +154,11 @@ public:
 	bool    ReverseY(int    iIn = -1) { if (iIn >= 0) bReverseY = iIn > 0; return bReverseY; };
 	double  FrameRate(double dIn = -1.0) { if (dIn >= 0) frameRate = dIn;    return frameRate; };
 	//CString ExportPath(void)                  { return exportPath; };
+	
 	CString ExportPath(CString sIn = L"") { if (!sIn.IsEmpty()) exportPath = sIn;  return exportPath; };
+
+	CString VideoFile(CString sIn = L"") { if (!sIn.IsEmpty()) videoFile = sIn;  return videoFile; };
+
 	//CString Suffix(void)					  { return suffix; };
 	CString Suffix(CString sIn = L"") { if (!sIn.IsEmpty()) suffix = sIn;  return suffix; };
 	CString ExpName(CString sIn = L"") { if (!sIn.IsEmpty()) expName = sIn;  return expName; };
@@ -366,6 +372,9 @@ public:
 
 		elem = para->FirstChildElement("exportPath");
 		if (elem != NULL)  ExportPath(CString(elem->GetText()));
+
+		elem = para->FirstChildElement("videoFile");
+		if (elem != NULL)  VideoFile(CString(elem->GetText()));
 
 		elem = para->FirstChildElement("mySet_mskEHM");
 		if (elem != NULL)

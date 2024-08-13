@@ -633,6 +633,7 @@ myMEMFR::myMEMFR(const char *FN)	// in BOOL CDemoApp::InitInstance() -> new CMai
 {	// *FN = NULL
 	bHeadOK = false;
 	mySetFileName_ex(FN);
+
 	if (myMEM_File_OpenRD(pfHandle, sFileName)){
 		myMEM_File_Read_ex(pfHandle, (unsigned char *)&ssHeadRead, sizeof(ssHeadRead), 0);
 		llSizeRead = myFileSeek(pfHandle, 0, FILE_END);

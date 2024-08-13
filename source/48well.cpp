@@ -212,48 +212,49 @@ BOOL CDemoApp::InitInstance()
 	pMainFrame->importParameters();
 
 #ifndef MY_NO_pylon
+
+
 	if (pMainFrame->bSimulate)
 		pMainFrame->checkFrameInterval = 30;
+
 #else
 	pMainFrame->checkFrameInterval = 57;
 #endif
+
 	//
-	pMainFrame->SetWindowText(L"Initialize Database");
-	
+
+#ifndef MY_NO_DB
 	if (pMainFrame->parameters.UseDb()) {
-#ifdef USE_DB
-		pMainFrame->Db.connect();
-		pMainFrame->Db.myTest();
-		pMainFrame->Db.getPersons();
-#endif
+		pMainFrame->SetWindowText(L"Initialize Database");
+		//pMainFrame->Db.connect();
+		//pMainFrame->Db.myTest();
+		//pMainFrame->Db.getPersons();
 	}
+#endif
 
 	//
 	//connect to camera	
 	//
-	pMainFrame->SetWindowText(L"Initialize Camera"); 
-	if (!pMainFrame->InitCamera())
-	{
+
+	pMainFrame->checkFrameInterval = 57;
+	
+	pMainFrame->SetWindowText(L"Initialize Camera");
+
+	if (!pMainFrame->InitCamera()){
 		MessageBox(NULL, L"Camera Initialization error!", L"Failed to Initialize the Camera", 1 | 16); // MB_ICONERROR = 16
-		//delete pMainFrame;
 		return FALSE;
 	}
-
-	//
 	// initialize Stimulation board.
-    // Important: the Camera should be running so we can check the UV Illumination
-	//
-	pMainFrame->SetWindowText(L"Initialize Stimulation Board");
+	// Important: the Camera should be running so we can check the UV Illumination
 
-	
-	if (! pMainFrame->InitStimulationBoard()) {
+#ifndef MY_NO_USB
+	pMainFrame->SetWindowText(L"Initialize Stimulation Board");	
+	if (!pMainFrame->InitStimulationBoard()) {
 		return MessageBox(0, L"Failed to Initialize Stimulation Board", L"Abort Execution", MB_OK);
 		pMainFrame->OnClose();
-		// never explicitly call 'delete' on a CFrameWnd, use DestroyWindow instead
-		//delete(pMainFrame);
-		//DestroyWindow(pMainFrame);
 		return FALSE;
 	}
+#endif
 
 	pMainFrame->SetWindowText(L"Initialize Buffer and Plots");
 	pMainFrame->InitBuffer();   //initialize Buffer after Camera since buffer size depends on fps
@@ -274,7 +275,7 @@ BOOL CDemoApp::InitInstance()
 	pMainFrame->StartMeasurement();
 	//
 	pMainFrame->canSize = TRUE;
-
+	//
 	return TRUE;
 }
 

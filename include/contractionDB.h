@@ -1,7 +1,5 @@
 #pragma once
 
-//#define USE_DB
-#ifdef USE_DB
 
 #include <cstdio>
 #include <memory>
@@ -10,20 +8,12 @@
 #include <math.h> 
 #include <atlstr.h>
 
+#include<string>
 
-#include <mysqlx/xdevapi.h>
-//using namespace ::mysqlx;
+//#include <mysqlx/xdevapi.h>
 
 
-//#include <mysql\jdbc.h>
 
-//#include "mysql_connection.h"
-
-//#include <cppconn\\driver.h>
-//#include <cppconn\\exception.h>
-//#include <cppconn\\resultset.h>
-//#include <cppconn\\statement.h>
-//#include <cppconn\\prepared_statement.h>
 
 class db_experiment {
 public:
@@ -74,13 +64,14 @@ public:
 	db_host host; 
 	db_host local_host;
 	db_host global_host;
+
+	//mysqlx::Session*    session;
 	
-	mysqlx::Session*    session;
-
-
+	
+	
 	contractionDB()
 	{
-		global_host.set(L"mysql-unigoe.gwdg.de", 3307, L"contractiondb", L"analyzeMmt", L"ana!zeMe@mnt"); 
+		global_host.set(L"mysql-unigoe.gwdg.de", 3307, L"contractiondb", L"user", L"password"); 
 		local_host.set(L"127.0.0.1", 3007, L"contractionDb", L"analyzeMeasurement", L"analyzeMeasurement");		
 		//
 		host = local_host;
@@ -106,22 +97,22 @@ public:
 	db_measurement measurement;
 	db_experiment  experiment; 
 	
-	double   get() {  };
-	int      connect() ;
-	int      myTest();
-	int      prepareStatement(CString stmt);
+	virtual double    get()      { return 0.0; };
+	virtual int       connect()  { return 0; };
+	virtual int       myTest()   { return 0; };
+	virtual int       prepareStatement(CString stmt) { return 0; };
 
-	void     myPrintTable(CString table_name);
+	//void     myPrintTable(CString table_name);
 
-	int      executeQuery();
-	int      executeQuery(CString stmt);
+	virtual int       executeQuery() { return 0;};
+	virtual int       executeQuery(CString stmt) { return 0; };
 
 
-	int      getPersons();
-	int      getExperimentId(CString expName, bool bCreate);
-	int      getMeasurementId(CString expName, CString meaName, bool bCreate);
-	int      getForcesId(CString expName, CString meaName, CString wellName, bool bCreate);
-	int      addExperiment(CString expName);
+	virtual int       getPersons() { return 0; };
+	virtual int       getExperimentId(CString expName, bool bCreate) { return 0; };
+	virtual int       getMeasurementId(CString expName, CString meaName, bool bCreate) { return 0; };
+	virtual int       getForcesId(CString expName, CString meaName, CString wellName, bool bCreate) { return 0; };
+	virtual int       addExperiment(CString expName) { return 0; };
 
 
 	int      measurementId() { return measurement.id; };
@@ -183,4 +174,3 @@ public:
 private:
 };
 
-#endif
