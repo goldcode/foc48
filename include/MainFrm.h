@@ -21,7 +21,8 @@ class myPlot;
 #include "USBstimulationBoard.h"
 
 // Following line is used for computer that has no pylon installed, to use a memory recorded file.
-//#define MY_NO_pylon
+
+// #define MY_NO_pylon
 
 // Following line is for memory recorded files.
 //#define USE_MY_MEM_FILE	1
@@ -90,7 +91,8 @@ public:
 	~CMainFrame();
 
 	CWinApp* pParent;
-	virtual bool InitCamera();
+	virtual bool InitCamera(); 
+	virtual bool InitStream();
 	virtual bool InitPlots();
 	virtual bool InitROIs();
 	virtual bool InitBuffer();

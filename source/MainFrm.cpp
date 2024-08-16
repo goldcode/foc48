@@ -33,6 +33,7 @@
 //#pragma comment(lib,"..\\libXML\\release\\libXMLw32.lib")
 
 #ifndef MY_NO_pylon
+
 using namespace GenApi;
 using namespace Basler_UsbCameraParams;
 #endif
@@ -1948,17 +1949,31 @@ bool CMainFrame::InitDb()
 	return true;
 }
 
+bool CMainFrame::InitStream()
+{
+	bool bReturn = true;
+	bCameraEvent = false;
+
+	parameters.ImageBuffer(1); // 4G
+	parameters.FrameRate(50);
+	imageWidth = mFF2->GetWidth();
+	imageHeight = mFF2->GetHeight();
+
+	timestamp = 0;
+	cameraClock = 1;
+
+	return 1;
+
+}
+
 bool CMainFrame::InitCamera()
 {
-#ifndef MY_NO_pylon
 	bool bReturn = false;
 	while (1) {
 		//m_wndStatusBar.SetPaneText(1, _T("Initialize Camera"), TRUE);
 		// Before using any pylon methods, the pylon runtime must be initialized. 
 		PylonInitialize();
-
 		CTlFactory& tlFactory = CTlFactory::GetInstance();
-
 		DeviceInfoList_t devices;
 
 		//Checks whether or not the camera is plugged in the device.
@@ -1971,27 +1986,31 @@ bool CMainFrame::InitCamera()
 				//InitCamera(); // cannot call self here
 				PylonTerminate();
 				continue;
-			}else if(Mbox == IDCANCEL){
+			}
+			else if (Mbox == IDCANCEL) {
 				//exit(EXIT_FAILURE); // better not quit here try return false
 				break;
 			}
 
 		}
-		//Sets up the camera object
-		Pylon::CDeviceInfo m_info;
+		else {
+			break;
+		}
+	}//Sets up the camera object
+	Pylon::CDeviceInfo m_info;
 
-		m_camera = new Pylon::CBaslerUsbInstantCamera(tlFactory.CreateFirstDevice(m_info));
+	m_camera = new Pylon::CBaslerUsbInstantCamera(tlFactory.CreateFirstDevice(m_info));
 
-		//SetGenICamLogConfig(getenv("TMP"));
+	//SetGenICamLogConfig(getenv("TMP"));
 
-		bCameraEvent = false;
-		// Camera event processing must be activated first, the default is off.
-		m_camera->GrabCameraEvents = true;
+	bCameraEvent = false;
+	// Camera event processing must be activated first, the default is off.
+	m_camera->GrabCameraEvents = true;
 
-		//pEventHandler = new CSampleCameraEventHandler;
+	//pEventHandler = new CSampleCameraEventHandler;
 
-	//m_camera->RegisterCameraEventHandler(pEventHandler, "EventExposureEndData", eMyExposureEndEvent, RegistrationMode_ReplaceAll, Cleanup_Delete, CameraEventAvailability_Optional); //RegistrationMode_ReplaceAll,RegistrationMode_Append
-	//
+//m_camera->RegisterCameraEventHandler(pEventHandler, "EventExposureEndData", eMyExposureEndEvent, RegistrationMode_ReplaceAll, Cleanup_Delete, CameraEventAvailability_Optional); //RegistrationMode_ReplaceAll,RegistrationMode_Append
+//
 	m_camera->Open();
 	// Get camera device information.
 	printf("Camera Device Information\n=========================\n");
@@ -2007,185 +2026,159 @@ bool CMainFrame::InitCamera()
 	printf("NumEmptyBuffers   : %d\n", m_camera->NumEmptyBuffers.GetValue());
 	printf("GrabLoopPriority  : %d\n", m_camera->GrabLoopThreadPriority.GetValue());
 	printf("IntGEPriority     : %d\n", m_camera->InternalGrabEngineThreadPriority.GetValue());
-    printf("pixelFormat       : %d\n", m_camera->PixelFormat.GetValue());
+	printf("pixelFormat       : %d\n", m_camera->PixelFormat.GetValue());
 
 
-	//printf("binningHorizontal : %d\n", m_camera->BinningHorizontal.GetValue());
-	//printf("binningVertical   : %d\n", m_camera->BinningVertical.GetValue());
-
-		//m_camera->BinningHorizontal.SetValue(parameters.GetBinningFactor());
-		//m_camera->BinningVertical.SetValue(parameters.GetBinningFactor());
-		//m_camera->BinningHorizontalMode.SetValue(BinningHorizontalMode_Average);
-		//m_camera->BinningVerticalMode.SetValue(BinningVerticalMode_Average);
-		//int maxNumBuf = 16;
-		//maxNumBuf = 300;   //keep 10 secs
-		//m_camera->MaxBufferSize(8834400);
+	printf("binningHorizontal : %d\n", m_camera->BinningHorizontal.GetValue());
+	printf("binningVertical   : %d\n", m_camera->BinningVertical.GetValue());
 
 
+	m_camera->BinningHorizontal.SetValue(parameters.BinningFactor());
+	m_camera->BinningVertical.SetValue(parameters.BinningFactor());
+	m_camera->BinningHorizontalMode.SetValue(BinningHorizontalMode_Sum);
+	m_camera->BinningVerticalMode.SetValue(BinningVerticalMode_Sum);
 
 	m_camera->MaxNumBuffer.SetValue(parameters.ImageBuffer());
 	parameters.ImageBuffer(m_camera->MaxNumBuffer.GetValue());
 	imageStackSize = parameters.ImageBuffer();
+	m_camera->AcquisitionFrameRateEnable.SetValue(true);
+	m_camera->AcquisitionFrameRate.SetValue(parameters.FrameRate());
+	parameters.FrameRate(m_camera->AcquisitionFrameRate.GetValue());
+	//
+	printf(" FPS      is      : %.1f\n", parameters.FrameRate());
+	printf(" MaxNumBuffer     :  %d\n", m_camera->MaxNumBuffer.GetValue());
 
-		//
-		m_camera->AcquisitionFrameRateEnable.SetValue(true);
-		m_camera->AcquisitionFrameRate.SetValue(parameters.FrameRate());
-		parameters.FrameRate(m_camera->AcquisitionFrameRate.GetValue());
-		//
-		printf(" FPS      is      : %.1f\n", parameters.FrameRate());
-		printf(" MaxNumBuffer     :  %d\n", m_camera->MaxNumBuffer.GetValue());
+	//cout << "MaxNumBuffer  : " <<  m_camera->MaxNumBuffer.SetValue(c_countOfImagesToGrab);
 
-		//cout << "MaxNumBuffer  : " <<  m_camera->MaxNumBuffer.SetValue(c_countOfImagesToGrab);
+	try
+	{
+		m_camera->EventSelector = EventSelector_ExposureEnd; //AAA
+		// Enable it.
+		m_camera->EventNotification = EventNotification_On;//EventNotification_GenICamEvent //AAA
+		bCameraEvent = true;
+	}
+	catch (...)
+	{
+		bCameraEvent = false;
+	}
 
+	printf("Width    : %d\n", m_camera->Width.GetValue());
+	printf("Height   : %d\n", m_camera->Height.GetValue());
+	printf("OffsetX  : %d\n", m_camera->OffsetX.GetValue());
+	printf("OffsetY  : %d\n", m_camera->OffsetY.GetValue());
+	printf("Gain     : %.1f\n", m_camera->Gain.GetValue());
+
+	m_camera->GainAuto.SetValue(GainAuto_Off, false);
+	m_camera->Gain.SetValue(parameters.Gain());
+	m_camera->ExposureTime.SetValue(parameters.ExposureTime());
+	// Camera might be mono or color
+	m_camera->PixelFormat.SetValue(PixelFormat_Mono8);
+
+	//if we have a color camera take only blue channel;
+	try
+	{
+		// Set the red balance ratio
+		m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Red);
+		m_camera->BalanceRatio.SetValue(0.0);
+		m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Green);
+		m_camera->BalanceRatio.SetValue(0.0);
+		m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Blue);
+		m_camera->BalanceRatio.SetValue(1.0);
+	}
+	catch (...)
+	{
+	}
+
+	//check if there is a GPIO for Flash triggring
+	if (parameters.UvFlash())
+	{
 		try
 		{
-			m_camera->EventSelector = EventSelector_ExposureEnd; //AAA
-			// Enable it.
-			m_camera->EventNotification = EventNotification_On;//EventNotification_GenICamEvent //AAA
-			bCameraEvent = true;
+			m_camera->ShutterMode.SetValue(ShutterMode_GlobalResetRelease);
+			// if the line is GPIO (maybe our camera, only line 3 and 4 is programable)
+			m_camera->LineSelector.SetValue(LineSelector_Line4);   // This value could be LineSelector_Line0 - 7,
+			m_camera->LineMode.SetValue(LineMode_Output); // set this line as output
+			m_camera->LineSource.SetValue(LineSource_ExposureActive);
+			m_camera->LineInverter.SetValue(true); //// Enable the line inverter for the I/O line selected
+			//
+			bFlashTrigger = true;
 		}
 		catch (...)
 		{
-			bCameraEvent = false;
-		}
-
-		printf("Width    : %d\n", m_camera->Width.GetValue());
-		printf("Height   : %d\n", m_camera->Height.GetValue());
-		printf("OffsetX  : %d\n", m_camera->OffsetX.GetValue());
-		printf("OffsetY  : %d\n", m_camera->OffsetY.GetValue());
-		printf("Gain     : %.1f\n", m_camera->Gain.GetValue());
-
-
-
-		m_camera->GainAuto.SetValue(GainAuto_Off, false);
-		m_camera->Gain.SetValue(parameters.Gain());
-		m_camera->ExposureTime.SetValue(parameters.ExposureTime());
-		// Camera might be mono or color
-		m_camera->PixelFormat.SetValue(PixelFormat_Mono8);
-
-
-
-		//if we have a color camera take only blue channel;
-		try
-		{
-			// Set the red balance ratio
-			m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Red);
-			m_camera->BalanceRatio.SetValue(0.0);
-			m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Green);
-			m_camera->BalanceRatio.SetValue(0.0);
-			m_camera->BalanceRatioSelector.SetValue(BalanceRatioSelector_Blue);
-			m_camera->BalanceRatio.SetValue(1.0);
-		}
-		catch (...)
-		{
-
-		}
-
-		//check if there is a GPIO for Flash triggring
-		if (parameters.UvFlash())
-		{
-			try
-			{
-				m_camera->ShutterMode.SetValue(ShutterMode_GlobalResetRelease);
-				// if the line is GPIO (maybe our camera, only line 3 and 4 is programable)
-				m_camera->LineSelector.SetValue(LineSelector_Line4);   // This value could be LineSelector_Line0 - 7,
-				m_camera->LineMode.SetValue(LineMode_Output); // set this line as output
-				m_camera->LineSource.SetValue(LineSource_ExposureActive);
-				m_camera->LineInverter.SetValue(true); //// Enable the line inverter for the I/O line selected
-				//
-				bFlashTrigger = true;
-			}
-			catch (...)
-			{
-				printf("Uv Flash: Failed to set Camera to GlobalReleaseReset, revert to  Global shutter");
-				bFlashTrigger = false;
-				m_camera->ShutterMode.SetValue(ShutterMode_Rolling);
-			}
-		}
-		else {
+			printf("Uv Flash: Failed to set Camera to GlobalReleaseReset, revert to  Global shutter");
 			bFlashTrigger = false;
 			m_camera->ShutterMode.SetValue(ShutterMode_Rolling);
 		}
-
-		//
-		int64_t	imgWidth = parameters.ImgWidth();
-		int64_t imgHeight = parameters.ImgHeight();
-		int64_t	xOffset = parameters.XOffset();
-		int64_t yOffset = parameters.YOffset();
-		//
-		int64_t	maxWidth = m_camera->SensorWidth.GetValue();
-		int64_t maxHeight = m_camera->SensorHeight.GetValue();
-		/*
-		* if no image Size is given in input maximize image
-		*/
-		m_camera->CenterX = false;
-		m_camera->CenterY = false;
-		m_camera->OffsetX = 0;
-		m_camera->OffsetY = 0;
-		//
-		m_camera->ReverseX.SetValue(parameters.ReverseX());
-		m_camera->ReverseY.SetValue(parameters.ReverseY());
-		//
-		m_camera->Width = (imgWidth > 0 && imgWidth < maxWidth - xOffset) ? imgWidth : maxWidth - xOffset;
-		m_camera->Height = (imgHeight > 0 && imgHeight < maxHeight - yOffset) ? imgHeight : maxHeight - yOffset;
-		//
-		m_camera->OffsetX = (xOffset > 0) ? xOffset / 8 * 8 : 0;
-		m_camera->OffsetY = (yOffset > 0) ? yOffset / 8 * 8 : 0;
-		//
-		imageWidth = m_camera->Width();
-		imageHeight = m_camera->Height();
-		//
-		m_image.Create(PixelType_Mono8, (int)m_camera->Width(), (int)m_camera->Height());
-		// 
-		// 
-		//
-		printf("Width      : %d \n", m_camera->Width());
-		printf("Height     : %d \n", m_camera->Height());
-		printf("OffsetX    : %d\n", m_camera->OffsetX());
-		printf("OffsetY    : %d\n", m_camera->OffsetY());
-		printf("Exposure   : %.1f\n", m_camera->ExposureTime());
-		printf("Gain       : %f \n", m_camera->Gain());
-		//
-		//
-		//m_camera->AcquisitionMode.SetValue(AcquisitionMode_SingleFrame); 
-		//m_camera->AcquisitionStart.Execute();
-		m_camera->GrabOne(5000, m_ptrGrabResult);
-		//m_camera->StartGrabbing(1);
-		//start acquisition thread	
-		//m_camera->RetrieveResult(5000, m_ptrGrabResult, TimeoutHandling_Return);
-		m_image.AttachGrabResultBuffer(m_ptrGrabResult);
-		timestamp = (double)m_ptrGrabResult->GetTimeStamp() / (double)cameraClock;
-		cameraClock = parameters.CameraClock();
-		//vTimer2 = vTimer2_TICK;	//
-		// Determine the sensor readout time under the current settings
-		double d = m_camera->SensorReadoutTime.GetValue();
-
-		printf("SensorReadoutTime : %f \n", m_camera->SensorReadoutTime.GetValue());
-		printf("ReverseX          : %d \n", m_camera->ReverseX.GetValue());
-		printf("ReverseY          : %d \n", m_camera->ReverseY.GetValue());
-
-		printf("MaxNumBuffer      : %d\n", m_camera->MaxNumBuffer.GetValue());
-		printf("MaxNumGrabResults : %d\n", m_camera->MaxNumGrabResults.GetValue());
-		//
-		m_image.Release();
-		// this is to release the previus one after all parameter is set, AAA
-		m_ptrGrabResult.Release();
-		m_camera->Close();
-		bReturn = true; break;
 	}
-#else
-	bool bReturn = true;
-	bCameraEvent = false;
+	else {
+		bFlashTrigger = false;
+		m_camera->ShutterMode.SetValue(ShutterMode_Rolling);
+	}
+	//
+	int64_t	imgWidth = parameters.ImgWidth();
+	int64_t imgHeight = parameters.ImgHeight();
+	int64_t	xOffset = parameters.XOffset();
+	int64_t yOffset = parameters.YOffset();
+	//
+	int64_t	maxWidth = m_camera->SensorWidth.GetValue();
+	int64_t maxHeight = m_camera->SensorHeight.GetValue();
+	/*
+	* if no image Size is given in input maximize image
+	*/
+	m_camera->CenterX = false;
+	m_camera->CenterY = false;
+	m_camera->OffsetX = 0;
+	m_camera->OffsetY = 0;
+	//
+	m_camera->ReverseX.SetValue(parameters.ReverseX());
+	m_camera->ReverseY.SetValue(parameters.ReverseY());
+	//
+	m_camera->Width = (imgWidth > 0 && imgWidth < maxWidth - xOffset) ? imgWidth : maxWidth - xOffset;
+	m_camera->Height = (imgHeight > 0 && imgHeight < maxHeight - yOffset) ? imgHeight : maxHeight - yOffset;
+	//
+	m_camera->OffsetX = (xOffset > 0) ? xOffset / 8 * 8 : 0;
+	m_camera->OffsetY = (yOffset > 0) ? yOffset / 8 * 8 : 0;
+	//
+	imageWidth = m_camera->Width();
+	imageHeight = m_camera->Height();
+	//
+	m_image.Create(PixelType_Mono8, (int)m_camera->Width(), (int)m_camera->Height());
+	// 
+	// 
+	//
+	printf("Width      : %d \n", m_camera->Width());
+	printf("Height     : %d \n", m_camera->Height());
+	printf("OffsetX    : %d\n", m_camera->OffsetX());
+	printf("OffsetY    : %d\n", m_camera->OffsetY());
+	printf("Exposure   : %.1f\n", m_camera->ExposureTime());
+	printf("Gain       : %f \n", m_camera->Gain());
+	//
+	//
+	//m_camera->AcquisitionMode.SetValue(AcquisitionMode_SingleFrame); 
+	//m_camera->AcquisitionStart.Execute();
+	m_camera->GrabOne(5000, m_ptrGrabResult);
+	//m_camera->StartGrabbing(1);
+	//start acquisition thread	
+	//m_camera->RetrieveResult(5000, m_ptrGrabResult, TimeoutHandling_Return);
+	m_image.AttachGrabResultBuffer(m_ptrGrabResult);
+	timestamp = (double)m_ptrGrabResult->GetTimeStamp() / (double)cameraClock;
+	cameraClock = parameters.CameraClock();
+	//vTimer2 = vTimer2_TICK;	//
+	// Determine the sensor readout time under the current settings
+	double d = m_camera->SensorReadoutTime.GetValue();
 
-	parameters.ImageBuffer(1); // 4G
-	parameters.FrameRate(50);
-	imageWidth = mFF2->GetWidth();
-	imageHeight = mFF2->GetHeight();
+	printf("SensorReadoutTime : %f \n", m_camera->SensorReadoutTime.GetValue());
+	printf("ReverseX          : %d \n", m_camera->ReverseX.GetValue());
+	printf("ReverseY          : %d \n", m_camera->ReverseY.GetValue());
 
-	timestamp = 0;
-	cameraClock = 1;
-
-#endif
+	printf("MaxNumBuffer      : %d\n", m_camera->MaxNumBuffer.GetValue());
+	printf("MaxNumGrabResults : %d\n", m_camera->MaxNumGrabResults.GetValue());
+	//
+	m_image.Release();
+	// this is to release the previus one after all parameter is set, AAA
+	m_ptrGrabResult.Release();
+	m_camera->Close();
+	bReturn = true;
 	return bReturn;
 }
 

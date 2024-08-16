@@ -47,7 +47,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -337,22 +337,18 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
-  
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Library Include="lib\myFIT_FUN_C2_d.lib" />
     <Library Include="lib\myListManger_d.lib" />
     <Library Include="lib\myMutex0_d.lib" />
     <Library Include="lib\myThread_Help_d.lib" />
   </ItemGroup>
-  
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Library Include="lib\myFIT_FUN_C2.lib" />
     <Library Include="lib\myListManger.lib" />
     <Library Include="lib\myMutex0.lib" />
     <Library Include="lib\myThread_Help.lib" />
   </ItemGroup>
-  
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

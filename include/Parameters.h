@@ -146,7 +146,7 @@ public:
 	double  Duration(double dIn = -1.0) { if (dIn >= 0) duration = dIn;   return duration; };
 	double  Interval(double dIn = -1.0) { if (dIn >= 0) interval = dIn;   return interval; };
 	double  LedIntensity(double dIn = -1.0) { if (dIn >= 0) ledIntensity = dIn;   return ledIntensity; };
-	int     Measurements(int iIn = -1.0) { if (iIn >= 0) measurements = iIn;  return binningFactor; };
+	int     Measurements(int iIn = -1.0) { if (iIn >= 0) measurements = iIn;  return measurements; };
 	int     ArduinoCOM(int iIn = -1.0) { if (iIn >= 0) arduinoCOM = iIn;  return arduinoCOM; };
 	bool    ReverseX(int    iIn = -1) { if (iIn >= 0) bReverseX = iIn > 0; return bReverseX; };
 	bool    ReverseY(int    iIn = -1) { if (iIn >= 0) bReverseY = iIn > 0; return bReverseY; };

@@ -128,27 +128,22 @@ void myError(HWND hWnd, const char* lpFunction, int dw);
 BOOL CDemoApp::InitInstance()
 {
 	
-//#ifdef _AFXDLL
-//	Enable3dControls();			// Call this when using MFC in a shared DLL
-//#else
-//	Enable3dControlsStatic();	// Call this when linking to MFC statically
-//#endif
+	//#ifdef _AFXDLL
+	//	Enable3dControls();			// Call this when using MFC in a shared DLL
+	//#else
+	//	Enable3dControlsStatic();	// Call this when linking to MFC statically
+	//#endif
 
 	CWinApp::InitInstance();
 
 	CMyCmdLineInfo rCmdInfo; //CCommandLineInfo rCmdInfo;
 
 	ParseCommandLine(rCmdInfo);
-
-	//pMainFrame->parameters.setEnvironmentC("my2Out_xml.xml");
-	//system("cmd /V:ON /C set FOC_OUTFILE=myNextTryToSet.xml ^&^& echo !FOC_OUTFILE!");	
-
+	
 	CString inParFile = rCmdInfo.m_strFileName;
 	CString defParFile = _T("C:\\Labhub\\import\\myrPlate.xml");
 	CString header     = "FOC48: Header Line";
-
-	//rCmdInfo.m_nShellCommand;
-
+	
 	if (inParFile.IsEmpty()) inParFile = defParFile;
 	if (! PathFileExists(inParFile))
 	{
@@ -156,14 +151,14 @@ BOOL CDemoApp::InitInstance()
 		return FALSE;
 	}
 
-	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
+	// Load standard INI file options (including MRU)
+	LoadStdProfileSettings();  
 
 	// create main Frame window
 	//
 	pMainFrame = new CMainFrame(this);
 	
-	// ugly way to import the second commandline Argument
-	
+	// ugly way to import the second commandline Argument	
 	if (!pMainFrame->LoadFrame(IDR_MAINFRAME) || !pMainFrame->myDllTestLoad())
 	{
 		MessageBox(NULL, inParFile, L"Failed to load LoadFrame or my48WellFF_vF.dll", 1);
@@ -178,8 +173,7 @@ BOOL CDemoApp::InitInstance()
 	//pMainFrame->FindStimulationBoard();
 	// The main window has been initialized, so show and update it.	
 	pMainFrame->UpdateWindow();
-	//HWND btn = GetDlgItem(pMainFrame->m_hWnd, ID_SAVE);
-
+	
 	//  Only after show, title can be seen
 	CControlBar* m_cbar = pMainFrame->GetControlBar(0);
 
@@ -187,6 +181,7 @@ BOOL CDemoApp::InitInstance()
 	pMainFrame->SetWindowText(header);
 	//pMainFrame->myShowInStatusBar(header);
 
+	Parameters * parameters = &pMainFrame->parameters;
 
 	if ( ! pMainFrame->parameters.read(inParFile)) {
 		//
@@ -214,24 +209,11 @@ BOOL CDemoApp::InitInstance()
 #ifndef MY_NO_pylon
 	if (pMainFrame->bSimulate)
 		pMainFrame->checkFrameInterval = 30;
-#else
-	pMainFrame->checkFrameInterval = 57;
-#endif
-	//
-	pMainFrame->SetWindowText(L"Initialize Database");
-	
-	if (pMainFrame->parameters.UseDb()) {
-#ifdef USE_DB
-		pMainFrame->Db.connect();
-		pMainFrame->Db.myTest();
-		pMainFrame->Db.getPersons();
-#endif
-	}
 
 	//
 	//connect to camera	
 	//
-	pMainFrame->SetWindowText(L"Initialize Camera"); 
+	pMainFrame->SetWindowText(L"Initialize Camera");
 	if (!pMainFrame->InitCamera())
 	{
 		MessageBox(NULL, L"Camera Initialization error!", L"Failed to Initialize the Camera", 1 | 16); // MB_ICONERROR = 16
@@ -239,21 +221,41 @@ BOOL CDemoApp::InitInstance()
 		return FALSE;
 	}
 
+#else
+	pMainFrame->checkFrameInterval = 57;
+	pMainFrame->InitStream()
+#endif
+	//
+
+
+	pMainFrame->SetWindowText(L"Initialize Database");
+	
+	if (pMainFrame->parameters.UseDb()) {
+
+#ifdef USE_DB
+		pMainFrame->Db.connect();
+		pMainFrame->Db.myTest();
+		pMainFrame->Db.getPersons();
+#endif
+	}
 	//
 	// initialize Stimulation board.
     // Important: the Camera should be running so we can check the UV Illumination
 	//
 	pMainFrame->SetWindowText(L"Initialize Stimulation Board");
-
 	
 	if (! pMainFrame->InitStimulationBoard()) {
 		return MessageBox(0, L"Failed to Initialize Stimulation Board", L"Abort Execution", MB_OK);
 		pMainFrame->OnClose();
-		// never explicitly call 'delete' on a CFrameWnd, use DestroyWindow instead
-		//delete(pMainFrame);
-		//DestroyWindow(pMainFrame);
 		return FALSE;
 	}
+
+	if (parameters->UvFlash()) {
+		printf("Set Flash Time to Exposure Time\n");
+
+
+	}
+
 
 	pMainFrame->SetWindowText(L"Initialize Buffer and Plots");
 	pMainFrame->InitBuffer();   //initialize Buffer after Camera since buffer size depends on fps
