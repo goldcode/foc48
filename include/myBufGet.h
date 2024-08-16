@@ -30,7 +30,7 @@ typedef struct _MY_BUF_USE_INFO{
    int nRev[10];
 }MY_BUF_USE_INFO, *pMY_BUF_USE_INFO;
 
-void myGetBuf_KEEP(char *&pBuf, int nNow, int &nSave);
+//void myGetBuf_KEEP(char *&pBuf, int nNow, int &nSave);
 
 //---------------------------------------------------------------------------
 class myBuf{

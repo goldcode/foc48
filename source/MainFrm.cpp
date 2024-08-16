@@ -1,23 +1,7 @@
-// MainFrm.cpp : implementation of the CMainFrame class
-//
-
-//#include "stdafx.h"
-//#include <afx.h>
-
-
-//#include <iostream>
-//#include <fstream>
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#include <afxdialogex.h>
 
 #include "MainFrm.h"
 #include "48well.h"		// //#include <afxext.h>         // MFC extensions
 #include "SaveDialogWn.h"
-//#include "SerialPort.h"
-
-// #include "comList.h"
-//#include "USBstimulationBoard.h"
 
 #include "myHelper.h"
 #include "DBG_print.h"
@@ -27,28 +11,16 @@
 
 #include "myEHM_FIT_M_01.h"
 
-//#include "mySerial.h"
-//#include "SerialClass.h"
-//#include "..\libXML\libXML\libXML.h"
-//#pragma comment(lib,"..\\libXML\\release\\libXMLw32.lib")
-
-#ifndef MY_NO_pylon
 
 using namespace GenApi;
 using namespace Basler_UsbCameraParams;
-#endif
+
 // Namespace for using cout.
 using namespace std;
-
-//using std::cout;
-//using std::endl;
 
 bool bCameraEvent;
 myEHM_FIT* eFit = NULL;
 
-#ifndef MY_NO_pylon
-
-//CSampleCameraEventHandler* pEventHandler;
 
 //Enumeration used for distinguishing different events.
 enum MyEvents
@@ -94,12 +66,7 @@ public:
 
 	}
 };
-#else
 
-#include "my_ssAVI.h"
-myMEMFR	*mFF2 = NULL;
-
-#endif
 /////////////////////////////////////////////////////////////////////////////resize
 // CMainFrame
 
@@ -133,14 +100,9 @@ CMainFrame::CMainFrame(CWinApp *p)
 {
 	pParent = p;
 	// TODO: add member initialization code here
-#ifndef MY_NO_pylon
 	m_camera = NULL;
 	h_RoiPreview = NULL;
 
-#else
-	if (mFF2 == NULL)
-		mFF2 = new myMEMFR("C:\\labhub\\FIT_TEST\\MY_MEM_DATA.tmp");
-#endif
 	nWell = nRowCount*nColCount;
 	m_trace=NULL;
 	m_Plot=NULL;
@@ -152,19 +114,19 @@ CMainFrame::CMainFrame(CWinApp *p)
 }
 CMainFrame::~CMainFrame()
 {
-#ifndef MY_NO_pylon
+
 	if (m_camera != NULL) {
 		if (m_camera->IsGrabbing())
 			m_camera->StopGrabbing();
 	}
-#endif
+
 	delete[] m_trace;
 	delete[] m_Plot;
 	delete[] roiPixOffset;  //array of 96
 	delete[] roiXpos;   //array of roiPix
 	delete[] RowSumR;
 	//SetStimulationBoardStatus('b');
-#ifndef MY_NO_pylon
+
 	if (m_camera != NULL) {
 		if (m_camera->IsOpen())
 			m_camera->Close();
@@ -174,31 +136,26 @@ CMainFrame::~CMainFrame()
 		catch (...) {}
 	}
 	PylonTerminate();
-#endif
+
 	if (eFit != NULL) {
 		delete eFit;
 		eFit = NULL;
-	}
-	//delete[] wRowSumR;
-	//delete[] RowSumL;
-	//delete[] wRowSumL;
+	}	
 }
 
 ULONG CMainFrame::GetGestureStatus(CPoint /*ptTouch*/) { return 0; }
 
 void CMainFrame::StartCamera()
 {
-#ifndef MY_NO_pylon
 	if (!m_camera->IsOpen())
 		m_camera->Open();
 	//
 	if (!m_camera->IsGrabbing())
 		m_camera->StartGrabbing();
 	//
-#endif
-	stimulationBoard.setUV(1, bUvFlash); 
+	stimulationBoard.setUV(1, bUvFlash, m_camera->ExposureTime());	
+	//
 	bGrabbing = true;
-
 }
 
 void CMainFrame::StimulationBoard_WR(const char * cIn)
@@ -226,11 +183,7 @@ void __fastcall CMainFrame::myShowInStatusBar(const wchar_t *pStr, const int nID
 
 bool __fastcall CMainFrame::myDllTestLoad(void)
 {
-#ifndef MY_NO_pylon
 	if (eFit == NULL)return false;
-#else
-	if (eFit == NULL || mFF2 == NULL)return false;
-#endif
 	return eFit->myDllTestLoad();
 }
 
@@ -238,35 +191,18 @@ bool __fastcall CMainFrame::mySetMEMFile(void)
 {
 	if (eFit == NULL)return false;
 	nFrameAddIndex = 0;
-#ifndef USE_MY_MEM_FILE
 	return true;
-#else
-	return eFit->mySetMEMFile((int)imageWidth, (int)imageHeight); // 4G
-#endif	//USE_MY_MEM_FILE
 }
 
 bool __fastcall CMainFrame::mySetMEMData(const char *pBuf)
 {
 	if (eFit == NULL)return false;
-#ifndef USE_MY_MEM_FILE
 	return true;
-#else
-	return eFit->myAddData(nFrameAddIndex++, pBuf);
-#endif	//USE_MY_MEM_FILE
 }
 
 void __fastcall CMainFrame::mySetMEMUser(void)
 {
-#ifndef USE_MY_MEM_FILE
 	return;
-#else
-	if (eFit != NULL) {
-		int n[6];
-		n[0] = xGrid; n[1] = yGrid; n[2] = roiCols; n[3] = roiRows; n[4] = 0; n[5] = 0;
-		eFit->mySetUser(n, 6);
-	}
-	return;
-#endif	//USE_MY_MEM_FILE
 }
 
 // enable the next incoming frame trigger the recalculating routing
@@ -290,24 +226,15 @@ void __fastcall CMainFrame::myCal_1(void)
 		myCal_nSSB(nSSB_0);
 		const unsigned char *pucA;
 		int nAdimX, nAdimY;
-#ifndef MY_NO_pylon
 		pucA = (const unsigned char *)m_image.GetBuffer();
 		nAdimX = imageWidth;
 		nAdimY = imageHeight;
-#else
-		pucA = (const unsigned char*)mFF2->pMEM;
-		nAdimX = mFF2->GetWidth();
-		nAdimY = mFF2->GetHeight();
-#endif
 		eFit->myINIT_48(pucA, nAdimX, nAdimY, nSSB_0);
 	}
 }
 
 int __fastcall CMainFrame::myToggle_Ex(int &mskVal, const unsigned int nID, const int nMSK)
 {
-	//#define MF_UNCHECKED        0x00000000L
-	//#define MF_CHECKED          0x00000008L
-	//#define MF_USECHECKBITMAPS  0x00000200L
 	CMenu *pMenu = GetMenu();
 	unsigned int unState = pMenu->GetMenuState(nID, MF_BYCOMMAND); //#define MF_BYCOMMAND        0x00000000L
 	if (unState != 0xFFFFFFFF){
@@ -351,10 +278,8 @@ int __fastcall CMainFrame::myMouseTrapToggle(void)
 void CMainFrame::StopCamera() {
 	//
 	printf("Close Camera\n");
-#ifndef MY_NO_pylon	
 	if (m_camera->IsOpen())
 		m_camera->Close();
-#endif
 	// first stop camera so that last image in buffer is stil lit
 	stimulationBoard.setUV(0);
 	bGrabbing = false;
@@ -393,9 +318,6 @@ void CMainFrame::StartMeasurement()
 	resetBuffer();   // remove this line will solve the HEAP error, Bao
 	//
 	iFrame = 0;
-	//stimulationBoard.setUV(1);	// no need, StartCamera() has setUV
-	//m_camera->AcquisitionMode.SetValue(AcquisitionMode_Continuous);
-	//m_camera->AcquisitionStart.Execute();
 	StartCamera(); // has -> stimulationBoard.setUV(1, bUvFlash); 
 	//
 	bMeasuring = true;
@@ -406,8 +328,7 @@ void CMainFrame::StartMeasurement()
 
 void CMainFrame::StopMeasurement()
 {
-	//lights Off
-	
+	//lights Off	
 	bMeasuring = false;
 	//
 	measurementStartTime = measurementStartTime + measurementInterval;
@@ -444,22 +365,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
-	//// create a view to occupy the client area of the frame
-	//if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW, CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL))
-	//{
-	//	TRACE0("Failed to create view window\n");
-	//	return -1;
-	//}
-
- //   //Create ToolBar
-	//if (!m_wndToolBar.Create(this) ||
-	//	!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
-	//{
-	//	TRACE0("Failed to create toolbar\n");
-	//	return -1;      // fail to create
-	//}
-
 	if (!m_wndStatusBar.Create(this))
 	{
 		TRACE0("Failed to create status bar\n");
@@ -490,13 +395,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-//#define vTimer2_TICK	48
-
-//MK_CONTROL Set if the CTRL key is down.
-//MK_LBUTTON Set if the left mouse button is down.
-//MK_MBUTTON Set if the middle mouse button is down.
-//MK_RBUTTON Set if the right mouse button is down.
-//MK_SHIFT Set if the SHIFT key is down.
 
 afx_msg void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -1141,7 +1039,7 @@ void CMainFrame::drawROIs(bool bBK)
 		nDrawROIs--;
 		return;
 	}
-#ifndef MY_NO_pylon
+
 	uint8_t* pPixImg = (uint8_t *) m_image.GetBuffer();
 	uint8_t* pPix;
 	int lineWidth = 6;
@@ -1211,80 +1109,6 @@ void CMainFrame::drawROIs(bool bBK)
 	else
 		pdc->BitBlt(nLeftX, nTopY, nWidth, nHeight, &pdcM, 0, 0, SRCCOPY);
 	//
-#else
-	const unsigned char* pPixImg = (const unsigned char*)mFF2->pMEM;
-	unsigned char* pPix;
-	int lineWidth = 6;
-	//
-	for (int i = 0; i < nWell; i++) {
-		for (int k = 0; k < lineWidth; k++) {
-			for (int j = 0; j < roiCols; j++){
-				// horizontal line above
-				pPix = (unsigned char*)(pPixImg + roiPixOffset[i] + roiPixList[j] + k * imageWidth - 1);
-				*pPix = 255;
-				pPix = pPix += roiCols;
-				*pPix = 255;
-				// horizontal line below
-				pPix = (unsigned char*)(pPixImg + roiPixOffset[i] + roiPixList[nRoiPix - roiCols + j] + (k - lineWidth + 1) * imageWidth - 1);
-				*pPix = 255;
-				pPix = pPix += roiCols;
-				*pPix = 255;
-			}
-			for (int j = 0; j < roiRows; j++) {
-				//vertical line width=3
-				pPix = (unsigned char*)(pPixImg + roiPixOffset[i] + roiCols + j * imageWidth - 1 + k);
-				*pPix = 255;
-			}
-		}
-	}
-	//	
-	//#ifdef _DEBUG h_RoiPreview->SetImage(m_image); 
-	//#endif
-	//Pylon::DisplayImage(1, ptrGrabResult);:(1, ptrGrabResult);
-	//
-	const bool bStrech = true;
-	const bool bFill = true;
-	const int nLeftX = 3;
-	const int nRightX = 3;
-	const int nTopY = 3;
-	const int nBottomY = 24;
-	CDC *pdc = GetDC();
-	if (pdc == NULL)return;
-	CDC pdcM;
-	pdcM.CreateCompatibleDC(pdc);
-	//
-	//bmpPreView.CopyImage(m_image);
-	//
-	HBITMAP hBMP = mFF2->myGetBMP();
-	HGDIOBJ hOld = pdcM.SelectObject(hBMP); // //HBITMAP hBMP = bmp; hOld = pdcM.SelectObject(bmpPreView);
-
-	//if ((mskEHM & MY_SHOW_OBJ_KASK)!=0) myDrawTag(pdcM.m_hDC, 0, 0, 1, 1, 1, 1);  // only BK
-
-	int nXX, nYY, nWidth, nHeight; nHeight = mFF2->GetHeight(); nWidth = mFF2->GetWidth();
-	if (bStrech)
-	{
-		RECT irr;	
-		GetClientRect(&irr);//GetWindowRect(&irr);
-		nXX = irr.right - irr.left - nLeftX - nRightX;
-		nYY = irr.bottom - irr.top - nTopY - nBottomY;
-		if (!bFill)
-		{
-			double dRR = double(nHeight) / double(nWidth); //double dRR = double(bmpPreView.GetHeight()) / double(bmpPreView.GetWidth());
-			if (dRR*double(nXX) > double(nYY)){
-				nXX = (int)(double(nYY) / dRR + 0.0005);
-			}
-			else
-			{
-				nYY = (int)(dRR * double(nXX) + 0.0005); //nYY = dRR*double(nXX) + 0.0005;
-			}
-
-		}
-		pdc->StretchBlt(nLeftX, nTopY, nXX, nYY, &pdcM, 0, 0, nWidth, nHeight, SRCCOPY); //pdc->StretchBlt(nLeftX, nTopY, nXX, nYY, &pdcM, 0, 0, bmpPreView.GetWidth(), bmpPreView.GetHeight(), SRCCOPY);
-	}
-	else
-		pdc->BitBlt(nLeftX, nTopY, nWidth, nHeight, &pdcM, 0, 0, SRCCOPY); //pdc->BitBlt(nLeftX, nTopY, bmpPreView.GetWidth(), bmpPreView.GetHeight(), &pdcM, 0, 0, SRCCOPY);
-
-#endif
 
 	//InvalidateRect(NULL, FALSE);
 	pdcM.SelectObject(hOld); // recover/replace, this step is for deleting pdcM using
@@ -1426,11 +1250,7 @@ inline double mySquare(const double d) {
 
 double CMainFrame::calcDistanceP()
 {
-#ifndef MY_NO_pylon
 	const unsigned char* pPixImg = (unsigned char*)m_image.GetBuffer();	
-#else
-	const unsigned char* pPixImg = (const unsigned char*)mFF2->pMEM;
-#endif
 	
 	bool bRawXY = ((mskEHM & MY_DSP_POLE_ENABLE) != 0);
 
@@ -1574,13 +1394,8 @@ long long int CMainFrame::calcImageSum()
 	long long int Sum=0;
 	//
 	
-#ifndef MY_NO_pylon
 	uint8_t* pPixImg = (uint8_t*) m_image.GetBuffer();
 	int j = (int)(m_image.GetWidth() * m_image.GetHeight());
-#else
-	const unsigned char* pPixImg = (const unsigned char*)mFF2->pMEM;
-	int j = (int)(mFF2->GetWidth() * mFF2->GetHeight());
-#endif
 	
 	for (int i = 0; i < j; i++)
 		Sum += pPixImg[i];
@@ -1597,11 +1412,7 @@ double CMainFrame::calcDistance()
 	double dist=0.0;
 	bool bOK;
 	//
-#ifndef MY_NO_pylon
 	uint8_t* pPixImg = (uint8_t*)m_image.GetBuffer();
-#else
-	const unsigned char* pPixImg = (const unsigned char*)mFF2->pMEM;
-#endif
 	const unsigned char* pPix;
 	//
 	uint64_t nPixL, nPixR;
@@ -1868,53 +1679,25 @@ bool CMainFrame::InitStimulationBoard()
 		bool bThorough = false;
 
 		if (bThorough) {
-			if (bExternalTrigger)
-			{
-				stimulationBoard.write("T");
-				stimulationBoard.write("F");
-			}
-			else {
-				stimulationBoard.write("t");
-				stimulationBoard.write("U");
-			}
-			//bool bUV   = stimulationBoard.setUV(1, 0);
-			//
-#ifndef MY_NO_pylon
-			//m_camera->AcquisitionMode.SetValue(AcquisitionMode_SingleFrame);
-			//m_camera->AcquisitionStart.Execute();
+			stimulationBoard.setUV(1, bUvFlash, m_camera->ExposureTime());
 			m_camera->Open();
 			// Grab some images for demonstration.
 			m_camera->GrabOne(5000, m_ptrGrabResult);
-			//m_camera->StartGrabbing(1);
-			//m_camera->RetrieveResult(5000, m_ptrGrabResult, TimeoutHandling_Return);
 			m_image.AttachGrabResultBuffer(m_ptrGrabResult);
-
 			Sum_On = calcImageSum();
-#else
-			Sum_On = 1000;
-#endif
-
 			outFileImg = parameters.ExportPath() + L"\\uvOn.bmp";
 			//m_image.Save(ImageFileFormat_Bmp, ((CStringA)outFileImg).GetString()); 
-#ifndef MY_NO_pylon
 			m_image.Release();
-#endif
 			//UV Off
-			stimulationBoard.write("u");
-			//stimulationBoard.setUV(0);
-#ifndef MY_NO_pylon
+			stimulationBoard.setUV(0);
+			//
 			m_camera->GrabOne(5000, m_ptrGrabResult);
 			m_image.AttachGrabResultBuffer(m_ptrGrabResult);
 			Sum_Off = calcImageSum();
-#else
-			Sum_Off = 0;
-#endif
-			outFileImg = parameters.ExportPath() + L"\\uvOff.bmp";
-			//m_image.Save(ImageFileFormat_Bmp, ((CStringA)outFileImg).GetString()); 
+			outFileImg = parameters.ExportPath() + L"\\uvOff.bmp";			
 
-#ifndef MY_NO_pylon
 			m_image.Release();
-#endif
+
 			double IO_ratio = (double)(Sum_On - Sum_Off) / Sum_On;
 			//
 			if (Sum_On < 1 || IO_ratio < 0.8)
@@ -1924,11 +1707,8 @@ bool CMainFrame::InitStimulationBoard()
 				MessageBoxW(buffer, L"Failed to test UV Light", MB_OK | MB_ICONWARNING);
 				bOK = false;
 			}
-
-#ifndef MY_NO_pylon
 			m_ptrGrabResult.Release();
 			m_camera->Close();
-#endif
 		}
 		//
 		if (rrVal > 0)
@@ -1956,8 +1736,8 @@ bool CMainFrame::InitStream()
 
 	parameters.ImageBuffer(1); // 4G
 	parameters.FrameRate(50);
-	imageWidth = mFF2->GetWidth();
-	imageHeight = mFF2->GetHeight();
+	//imageWidth = mFF2->GetWidth();
+	//imageHeight = mFF2->GetHeight();
 
 	timestamp = 0;
 	cameraClock = 1;
@@ -1966,40 +1746,50 @@ bool CMainFrame::InitStream()
 
 }
 
+CTlFactory * CMainFrame::InitTransportLayer() {
+	bool bReturn = false;
+	CTlFactory* tlFactory;
+	PylonInitialize();
+	DeviceInfoList_t devices;
+	//check for devices
+	while (1) {
+		tlFactory = &CTlFactory::GetInstance();
+		//Checks whether or not the camera is plugged in the device.
+		if (tlFactory->EnumerateDevices(devices) == 0)
+		{
+			int Mbox = MessageBox(L"Please plug in the camera and click 'Retry'.", L"Camera not detected.", MB_RETRYCANCEL | MB_ICONERROR);
+			if (Mbox == IDRETRY)
+				continue;
+			else if (Mbox == IDCANCEL) 
+				break;			
+			else
+				break;
+		}
+		break;
+	}
+	return tlFactory;
+}
+
+
+
 bool CMainFrame::InitCamera()
 {
 	bool bReturn = false;
-	while (1) {
-		//m_wndStatusBar.SetPaneText(1, _T("Initialize Camera"), TRUE);
-		// Before using any pylon methods, the pylon runtime must be initialized. 
-		PylonInitialize();
-		CTlFactory& tlFactory = CTlFactory::GetInstance();
-		DeviceInfoList_t devices;
+	CTlFactory* tlFactory;
+	
+	printf("Initialize Transport Layer\n");
 
-		//Checks whether or not the camera is plugged in the device.
-		if (tlFactory.EnumerateDevices(devices) == 0)
-		{
-			int Mbox = MessageBox(L"Please plug in the camera and click 'Retry'.", L"Camera not detected.", MB_RETRYCANCEL | MB_ICONERROR);
+	try {
+		tlFactory = InitTransportLayer();
+	}
+	catch (std::exception ex) {
+		wchar_t wStr[100];
+		mbstowcs(wStr, ex.what(), 99);
+		MessageBox(wStr, L"failed");
+	}
 
-			if (Mbox == IDRETRY)
-			{
-				//InitCamera(); // cannot call self here
-				PylonTerminate();
-				continue;
-			}
-			else if (Mbox == IDCANCEL) {
-				//exit(EXIT_FAILURE); // better not quit here try return false
-				break;
-			}
-
-		}
-		else {
-			break;
-		}
-	}//Sets up the camera object
 	Pylon::CDeviceInfo m_info;
-
-	m_camera = new Pylon::CBaslerUsbInstantCamera(tlFactory.CreateFirstDevice(m_info));
+	m_camera = new Pylon::CBaslerUsbInstantCamera(tlFactory->CreateFirstDevice(m_info));
 
 	//SetGenICamLogConfig(getenv("TMP"));
 
@@ -2028,16 +1818,25 @@ bool CMainFrame::InitCamera()
 	printf("IntGEPriority     : %d\n", m_camera->InternalGrabEngineThreadPriority.GetValue());
 	printf("pixelFormat       : %d\n", m_camera->PixelFormat.GetValue());
 
+	//crashes for cameras w/Out binnint
+	// 
+	if (parameters.BinningFactor()>1) {
+		try {
+			printf("check for binning\n");
+			printf("binningHorizontal : %d\n", m_camera->BinningHorizontal.GetValue());
+			printf("binningVertical   : %d\n", m_camera->BinningVertical.GetValue());
 
-	printf("binningHorizontal : %d\n", m_camera->BinningHorizontal.GetValue());
-	printf("binningVertical   : %d\n", m_camera->BinningVertical.GetValue());
-
-
-	m_camera->BinningHorizontal.SetValue(parameters.BinningFactor());
-	m_camera->BinningVertical.SetValue(parameters.BinningFactor());
-	m_camera->BinningHorizontalMode.SetValue(BinningHorizontalMode_Sum);
-	m_camera->BinningVerticalMode.SetValue(BinningVerticalMode_Sum);
-
+			m_camera->BinningHorizontal.SetValue(parameters.BinningFactor());
+			m_camera->BinningVertical.SetValue(parameters.BinningFactor());
+			m_camera->BinningHorizontalMode.SetValue(BinningHorizontalMode_Sum);
+			m_camera->BinningVerticalMode.SetValue(BinningVerticalMode_Sum);
+		}
+		catch (std::exception ex) {
+			wchar_t wStr[100];
+			mbstowcs(wStr, ex.what(), 99);
+			MessageBox(wStr, L"Binning failed");
+		}
+	}
 	m_camera->MaxNumBuffer.SetValue(parameters.ImageBuffer());
 	parameters.ImageBuffer(m_camera->MaxNumBuffer.GetValue());
 	imageStackSize = parameters.ImageBuffer();
@@ -2087,6 +1886,7 @@ bool CMainFrame::InitCamera()
 	}
 	catch (...)
 	{
+		printf("WARNING: Can not set Color Balance, monochrome ?\n");
 	}
 
 	//check if there is a GPIO for Flash triggring
@@ -2436,7 +2236,6 @@ VOID CALLBACK myCheckFrame(HWND hwnd, UINT message, unsigned long long idTimer, 
 		int dn = myTimePass_us(nSS, nFF);	// get time passed in us	
 		int nFF_Count = 0;
 
-#ifndef MY_NO_pylon		
 
 		pMain->m_camera->RetrieveResult(5000, pMain->m_ptrGrabResult, TimeoutHandling_Return);
 		if (pMain->m_ptrGrabResult->GrabSucceeded())
@@ -2447,18 +2246,6 @@ VOID CALLBACK myCheckFrame(HWND hwnd, UINT message, unsigned long long idTimer, 
 			nFF_Count++;
 		}
 
-#else
-
-		bool bGet = mFF2->myGetBlock(nFF);  // get image, nFF is index, 0-based
-		if (bGet){
-			//pMain->drawROIs();			// if image is correctly get, display it
-			pMain->addFrameBuffer(mFF2->pMEM);   // contain recalculate routing
-			//theApp.pMainFrame->m_image.AttachGrabResultBuffer(theApp.pMainFrame->m_ptrGrabResult);
-			pMain->analyzeFrame();   // iFrame will be added
-			nFF_Count++;
-		}
-
-#endif
 		// information
 		wchar_t wStr[16];
 		swprintf_s(wStr, 14, L"%d", dn / 10000); pMain->myShowInStatusBar(wStr, 3); nFF += nFF_Count;
@@ -2466,17 +2253,10 @@ VOID CALLBACK myCheckFrame(HWND hwnd, UINT message, unsigned long long idTimer, 
 	}
 }
 
-#ifndef MY_NO_pylon
 
 bool CMainFrame::addFrameBuffer(Pylon::CGrabResultPtr& m_result_ptr)
 {	
 	m_image.AttachGrabResultBuffer(m_result_ptr);
-#ifndef USE_MY_MEM_FILE
-	
-#else
-	mySetMEMData((char *)m_image.GetBuffer());
-#endif	//USE_MY_MEM_FILE
-
 	myNewMethodPreCheck();
 
 	imageStackIndx = imageStackNum % imageStackSize;
@@ -2491,30 +2271,6 @@ bool CMainFrame::addFrameBuffer(Pylon::CGrabResultPtr& m_result_ptr)
 	return true;
 }
 
-#else
-
-bool CMainFrame::addFrameBuffer(const unsigned char *pBuf)
-{
-#ifndef USE_MY_MEM_FILE
-
-#else
-	mySetMEMData((const char *)pBuf);
-#endif	//USE_MY_MEM_FILE
-
-	myNewMethodPreCheck();
-
-	imageStackNum++;
-	imageStackIndx = imageStackNum % imageStackSize; // infuture, user can delete
-
-	//if (imageStackNum > imageStackSize)
-	//	m_imageStack[imageStackIndx].Release();
-
-	//m_imageStack[imageStackIndx] = m_result_ptr;
-	
-	return true;
-}
-
-#endif
 
 void __fastcall CMainFrame::myNewMethodPreCheck(void)
 {
@@ -2615,31 +2371,6 @@ void CMainFrame::UpdateView()
 	}
 }
 
-//void CMainFrame::OnUpdatePane(CCmdUI* pCmdUI)
-//{
-//	pCmdUI->Enable(); // default is TRUE
-//}
-
-/////////////////////////////////////////////////////////////////////////////
-// CDemoView drawing
-
-//void CMainFrame::OnDraw(CDC* pDC)		// this is called by internal OnPaint
-//{
-//	//CDemoDoc* pDoc = GetDocument();  // AAA seems no use
-//
-//	//CFrameWnd::OnDraw
-//}
-
-//BOOL CMainFrame::OnEraseBkgnd(CDC* pDC){
-//	return TRUE;
-//}
-
-//void CMainFrame::OnPaint(){
-//	//CFrameWnd::OnPaint();
-//CPaintDC dc(this);
-//OnPrepareDC(&dc);
-//OnDraw(&dc);
-//}
 
 #define SC_MAXIMIZE2		0xF032	// when double click on the title bar
 #define SC_RESTORE2			0xF122

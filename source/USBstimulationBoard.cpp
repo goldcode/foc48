@@ -8,70 +8,6 @@
 
 #include "DBG_print.h"
 
-//#define MY_MAX_CMD_COUNT	11   // increase if new commamd is needed, defined in h file, we skip here
-
-/*
-MY_ARDUINO_STATUS ssCMD[MY_MAX_CMD_COUNT] = {
-	
-	{48,  "getDeviceName"}, //0
-	
-	{49,  "getStatus"},		//1
-	{85,  "UV_on"},			//2
-	{117, "UV_off"},		//2
-	{87,  "UV_TRIGGER"},	//Goto trigger mode
-
-	{83, "stimulation_on"},	//"S"
-	{115, "stimulation_off"},//"s"
-	
-	{22, "setStimulationFrequency"},    //7,Frequency in Herz
-	{23, "setStimulationDuration"},     //8,Durtion of Stimulation
-	{24, "setPulseOnDuration"},         //9,if PulseOn + PulseOff > StimulationDuration multiple pulses are sent
-	{25, "setPulseOffDuration"}		//10
-};
-
-
-const char* myID2STR(const int nID)   // search all IDs find the string name of the ID
-{
-	for (int i = 0; i < MY_MAX_CMD_COUNT; i++) {
-		if (ssCMD[i].ID == nID)
-			return(ssCMD[i].strName);
-	}
-	return(NULL);
-}
-
-
-#define MY_MAX_CMD_BUF_LENGTH	50		
-char* myCAPSTR(const char* In, char* Out, const int n= MY_MAX_CMD_BUF_LENGTH) {
-	int j = strlen(In);
-	if (j >= n)
-		j = n - 1;  // last is 0
-	for (int i = 0; i < j; i++) {
-		Out[i] = myCAP(In[i]);
-	}
-	Out[j] = 0; // c string, last one must 0
-	return Out;
-}
-
-const int mySTR2ID(const char *strName)   // search all names find the ID
-{
-	for (int i = 0; i < MY_MAX_CMD_COUNT; i++) {
-		if (strcmp(ssCMD[i].strName, strName)==0)
-			return(ssCMD[i].ID);
-	}
-	return -1;
-}
-
-const int mySTR2ID_CAP(const char* strName)   // search all names find the ID, regardless the captial letters
-{
-	char A[MY_MAX_CMD_BUF_LENGTH], B[MY_MAX_CMD_BUF_LENGTH];
-	myCAPSTR(strName,B);
-	for (int i = 0; i < MY_MAX_CMD_COUNT; i++) {
-		if (strcmp(myCAPSTR(ssCMD[i].strName, A), B) == 0)
-			return(ssCMD[i].ID);
-	}
-	return -1;
-}
-*/
 
 bool __fastcall myBuildCOM(const int nCOM, char* str) // using format \\.\COMx for com port in local computer even if port number is >9.
 {
@@ -295,43 +231,6 @@ DWORD ReadString(TCommPort &cp, char *sz, const int size)
 #define MY_BLOCK_READING_TIME		25
 #define MY_MAIN_TIMEOUT				2000
 
-//int __fastcall mySend2(const int nCOM, const char cValue, int &nRead, char *pBuf, const int nLen){
-//	nRead = 0;
-//	while (1){
-//		TCommPort cp = { 0 };
-//		if (!OpenPort(nCOM, cp)) {
-//			printf("Open port error: %d\n", GetLastError());
-//			break;
-//		}
-//
-//		pBuf[0] = cValue; SendString(cp, pBuf, 1); //#OK
-//		//SendChar(cp, cValue);
-//
-//		char sz[1024 * 4];
-//		int nTimeOut = MY_MAIN_TIMEOUT;
-//		int nSleep = MY_BLOCK_READING_TIME;
-//		while (nTimeOut>0 && nLen > nRead)
-//		{
-//			Sleep(nSleep);
-//			// CNT send
-//			int i = ReadString(cp, sz, sizeof(sz)-1);
-//			int j;
-//			if (i > 0) {
-//				printf("get %d bytes.\n", i);
-//				if (i > nLen - nRead)j = nLen - nRead;
-//				else j = i;
-//				for (int k = 0; k < j; k++)
-//					pBuf[k + nRead] = sz[k];
-//				nRead += j;
-//			}
-//			else
-//				nTimeOut -= nSleep;
-//		}
-//		ClosePort(cp);
-//		break;
-//	}
-//	return nRead;
-//}
 
 int __fastcall mySend4(const int nCOM, const char *sValue, int &nInOutLen, char *pBuf, const int nBufLen){
 
@@ -442,37 +341,32 @@ bool USBstimulationBoard::setStatus(const char *sStatus)
 }
 
 
-int USBstimulationBoard::setUV(bool bUV, bool bFlash)
+int USBstimulationBoard::setUV(bool bUV, bool bFlash, long long int iExposure)
 {
-	//const char *sCmd = bUV ? "U" : "u";
-	//const char sCmd = bUV ? 'a' : 'b';	
-	const char* sCmd;
-	//open();
+	char * sCmd ;
 	if (bUV)
 		if (bFlash)
-			sCmd = "F\0";
+			sCmd = "F";
 		else
-			sCmd = "U\0";
+			sCmd="U";
 	else
-		sCmd = "u\0";
+		sCmd="u";
 	//
-	//
-	int ret = write(sCmd, 2);
-	//Sleep(ARDUINO_WAIT_TIME);	
-	//close(); 
-	//
-	return ret;
+	return set(sCmd, iExposure);
 }
 
-int USBstimulationBoard::set(const char* sCmd, int iVal)
+//values are set via C \1000
+int USBstimulationBoard::set(const char * sCmd, long long int iVal)
 {
-	//open();
 	char sCmdBuf[32];
-	int len = sprintf_s(sCmdBuf, 31, "%c \\%d", sCmd[0], iVal);
+	int len = 0;
+	if (iVal>=0)
+		len = sprintf_s(sCmdBuf, 31, "%c \\%d", sCmd, iVal);
+	else
+		len = sprintf_s(sCmdBuf, 31, "%c", sCmd);
 
 	int ret = write(sCmdBuf, len);
-	//Sleep(ARDUINO_WAIT_TIME);
-	//close();
+	//
 	return ret;
 }
 

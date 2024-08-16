@@ -21,7 +21,6 @@ class myPlot;
 #include "USBstimulationBoard.h"
 
 // Following line is used for computer that has no pylon installed, to use a memory recorded file.
-
 // #define MY_NO_pylon
 
 // Following line is for memory recorded files.
@@ -74,10 +73,10 @@ VOID CALLBACK myUpdateScreen	(HWND hwnd, UINT message, unsigned long long idTime
 //extern CDemoApp theApp;
 
 
-VOID CALLBACK myCheckFrame(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
-VOID CALLBACK myStartMeasurement(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
-VOID CALLBACK myStopMeasurement(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
-VOID CALLBACK myUpdateScreen(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
+//VOID CALLBACK myCheckFrame(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
+//VOID CALLBACK myStartMeasurement(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
+//VOID CALLBACK myStopMeasurement(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
+//VOID CALLBACK myUpdateScreen(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
 
 
 class CMainFrame : public CFrameWnd
@@ -91,7 +90,9 @@ public:
 	~CMainFrame();
 
 	CWinApp* pParent;
-	virtual bool InitCamera(); 
+	CTlFactory* InitTransportLayer();
+		
+	virtual bool InitCamera();
 	virtual bool InitStream();
 	virtual bool InitPlots();
 	virtual bool InitROIs();
@@ -290,7 +291,6 @@ public:
 	int       imageStackIndx = 0;
 	long long imageStackNum = 0;
 
-#ifndef MY_NO_pylon
 	Pylon::CBaslerUsbInstantCamera *m_camera;
 	//aaa m_ptrGrabResult;
 	Pylon::CGrabResultPtr m_ptrGrabResult;
@@ -304,9 +304,6 @@ public:
 	//
 
 	bool addFrameBuffer(Pylon::CGrabResultPtr &m_result_ptr);
-#else
-	bool addFrameBuffer(const unsigned char *pBuf);
-#endif
 	
 #ifdef USE_DB
 	contractionDB Db;
@@ -320,11 +317,7 @@ public:
 	int64_t imageWidth = 0;
 	int64_t imageHeight = 0;	
 
-	//unsigned char pixThresh = 127;
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMainFrame)
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	//}}AFX_VIRTUAL
 
 	bool bAutoSave  = false;
 	bool bAutoClose = false;
@@ -356,14 +349,7 @@ public:
 	bool compressFile(CString fName, bool bKeepSource);
 
 	void OnSize(UINT nType, int cx, int cy);
-	//void OnDraw(CDC* pDC);
-	//void OnUpdatePane(CCmdUI* pCmdUI);
-	//void OnPaint(void);
-	//BOOL OnEraseBkgnd(CDC* pDC);
-
-	//BOOL ReadXML(CString inParFile);
-
-	//afx_msg void OnMaximizeWindow();
+	
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);	
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point){Save(true);}

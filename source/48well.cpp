@@ -1,8 +1,3 @@
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#include <afxdialogex.h>
-//#include <iostream>
-//#include <sstream>
 
 #include "48well.h"		// //#include <afxext.h>         // MFC extensions
 #include "MainFrm.h"
@@ -15,14 +10,7 @@
 #include "DBG_print.h"
 #endif
 
-
-//using namespace std;
-//using std::cout;
-//using std::endl;
-//
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
+using namespace std;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -127,13 +115,6 @@ void myError(HWND hWnd, const char* lpFunction, int dw);
 
 BOOL CDemoApp::InitInstance()
 {
-	
-	//#ifdef _AFXDLL
-	//	Enable3dControls();			// Call this when using MFC in a shared DLL
-	//#else
-	//	Enable3dControlsStatic();	// Call this when linking to MFC statically
-	//#endif
-
 	CWinApp::InitInstance();
 
 	CMyCmdLineInfo rCmdInfo; //CCommandLineInfo rCmdInfo;
@@ -205,26 +186,22 @@ BOOL CDemoApp::InitInstance()
 	}
 	
 	pMainFrame->importParameters();
-
-#ifndef MY_NO_pylon
-	if (pMainFrame->bSimulate)
-		pMainFrame->checkFrameInterval = 30;
-
+		
 	//
 	//connect to camera	
 	//
 	pMainFrame->SetWindowText(L"Initialize Camera");
-	if (!pMainFrame->InitCamera())
-	{
-		MessageBox(NULL, L"Camera Initialization error!", L"Failed to Initialize the Camera", 1 | 16); // MB_ICONERROR = 16
-		//delete pMainFrame;
-		return FALSE;
-	}
+	
+	try {
+		pMainFrame->InitCamera();
+	} catch (std::exception ex) {
+			wchar_t wStr[100];
+			mbstowcs(wStr, ex.what(), 99);
+			//MessageBox(wStr, L"Camera Init. failed");
+			exit;
+	}	
+	
 
-#else
-	pMainFrame->checkFrameInterval = 57;
-	pMainFrame->InitStream()
-#endif
 	//
 
 

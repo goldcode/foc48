@@ -64,14 +64,14 @@ public:
 	bool initialize();
 	int  RR(int rr); 
 	int  setStimulation(bool bOn = TRUE, bool bFreq=TRUE);
-	int  setUV(bool bOn=TRUE, bool bFlash = FALSE);
+	int  setUV(bool bOn=TRUE, bool bFlash = FALSE, long long int iExposure=-1);
 	int  setTrigger(bool bOn = TRUE, bool bExt = TRUE);
 
 	int     write(const char *sCmd, unsigned len=1);
 	char* read();
 	char*   write_read(const char* sCmd, unsigned len = 1, int &RetCount = glReturn);
 
-	int     set(const char* sCmd, int iVal);
+	int     set(const char * sCmd, long long int iVal=-1);
 	
 	static const int  strReadLength = 255; 
 	char strRead[strReadLength];
