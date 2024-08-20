@@ -451,7 +451,7 @@ public:
 			//myError(this->m_hWnd, "RegQueryValue, unable to get value_name.", ret);
 		}
 		else {
-			strTmp[n] = 0; printf("value_name read as %ls\n", strTmp);
+			strTmp[n] = 0; printf(L"value_name read as %ls\n", strTmp);
 		}
 		RegCloseKey(key);
 		return true;
