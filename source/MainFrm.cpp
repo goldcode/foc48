@@ -117,15 +117,9 @@ CMainFrame::CMainFrame(CWinApp *p)
 {
 	pParent = p;
 	// TODO: add member initialization code here
-#ifndef MY_NO_pylon
 	m_camera = NULL;
 	h_RoiPreview = NULL;
 
-#else
-	if (mFF2 == NULL)
-		//mFF2 = new myMEMFR("C:\\Labhub\\Import\\myrPlate_Video.bin");
-		mFF2 = new myMEMFR( CStringA(parameters.VideoFile()) );
-#endif
 	nWell = nRowCount*nColCount;
 	m_trace=NULL;
 	m_Plot=NULL;
@@ -137,19 +131,16 @@ CMainFrame::CMainFrame(CWinApp *p)
 }
 CMainFrame::~CMainFrame()
 {
-#ifndef MY_NO_pylon
 	if (m_camera != NULL) {
 		if (m_camera->IsGrabbing())
 			m_camera->StopGrabbing();
 	}
-#endif
 	delete[] m_trace;
 	delete[] m_Plot;
 	delete[] roiPixOffset;  //array of 96
 	delete[] roiXpos;   //array of roiPix
 	delete[] RowSumR;
 	//SetStimulationBoardStatus('b');
-#ifndef MY_NO_pylon
 	if (m_camera != NULL) {
 		if (m_camera->IsOpen())
 			m_camera->Close();
@@ -159,7 +150,6 @@ CMainFrame::~CMainFrame()
 		catch (...) {}
 	}
 	PylonTerminate();
-#endif
 	if (eFit != NULL) {
 		delete eFit;
 		eFit = NULL;
@@ -173,14 +163,12 @@ ULONG CMainFrame::GetGestureStatus(CPoint /*ptTouch*/) { return 0; }
 
 void CMainFrame::StartCamera()
 {
-#ifndef MY_NO_pylon
 	if (!m_camera->IsOpen())
 		m_camera->Open();
 	//
 	if (!m_camera->IsGrabbing())
 		m_camera->StartGrabbing();
 	//
-#endif
 	stimulationBoard.setUV(1, bUvFlash); 
 	bGrabbing = true;
 
@@ -1834,7 +1822,7 @@ bool CMainFrame::InitStimulationBoard()
 		}
 		//
 		//bExternalTrigger
-		int nStim = stimulationBoard.setStimulation(0);
+		int nStim = stimulationBoard.setStimulation(0,0);
 		bExternalTrigger = false;
 
 		stimulationBoard.write("q\0", 2); //bQuiet
@@ -1853,7 +1841,6 @@ bool CMainFrame::InitStimulationBoard()
 			}
 			//bool bUV   = stimulationBoard.setUV(1, 0);
 			//
-#ifndef MY_NO_pylon
 			//m_camera->AcquisitionMode.SetValue(AcquisitionMode_SingleFrame);
 			//m_camera->AcquisitionStart.Execute();
 			m_camera->Open();
@@ -1864,31 +1851,20 @@ bool CMainFrame::InitStimulationBoard()
 			m_image.AttachGrabResultBuffer(m_ptrGrabResult);
 
 			Sum_On = calcImageSum();
-#else
-			Sum_On = 1000;
-#endif
 
 			outFileImg = parameters.ExportPath() + L"\\uvOn.bmp";
 			//m_image.Save(ImageFileFormat_Bmp, ((CStringA)outFileImg).GetString()); 
-#ifndef MY_NO_pylon
 			m_image.Release();
-#endif
 			//UV Off
 			stimulationBoard.write("u");
 			//stimulationBoard.setUV(0);
-#ifndef MY_NO_pylon
 			m_camera->GrabOne(5000, m_ptrGrabResult);
 			m_image.AttachGrabResultBuffer(m_ptrGrabResult);
 			Sum_Off = calcImageSum();
-#else
-			Sum_Off = 0;
-#endif
 			outFileImg = parameters.ExportPath() + L"\\uvOff.bmp";
 			//m_image.Save(ImageFileFormat_Bmp, ((CStringA)outFileImg).GetString()); 
 
-#ifndef MY_NO_pylon
 			m_image.Release();
-#endif
 			double IO_ratio = (double)(Sum_On - Sum_Off) / Sum_On;
 			//
 			if (Sum_On < 1 || IO_ratio < 0.8)
@@ -1899,16 +1875,14 @@ bool CMainFrame::InitStimulationBoard()
 				bOK = false;
 			}
 
-#ifndef MY_NO_pylon
 			m_ptrGrabResult.Release();
 			m_camera->Close();
-#endif
 		}
 		//
 		if (rrVal > 0)
 			stimulationBoard.RR(rrVal);
 		else
-			stimulationBoard.setStimulation(0);
+			stimulationBoard.setStimulation(0,0);
 
 		bOK = true; break;
 	}

@@ -211,17 +211,11 @@ BOOL CDemoApp::InitInstance()
 	
 	pMainFrame->importParameters();
 
-#ifndef MY_NO_pylon
 
 
 	if (pMainFrame->bSimulate)
 		pMainFrame->checkFrameInterval = 30;
 
-#else
-	pMainFrame->checkFrameInterval = 57;
-#endif
-
-	//
 
 #ifndef MY_NO_DB
 	if (pMainFrame->parameters.UseDb()) {
@@ -339,58 +333,60 @@ void CDemoApp::OnAppUvOn()
 
 void CDemoApp::OnAppUvOff()
 {
-	//pMainFrame->stimulationBoard.setUV(FALSE);
-	pMainFrame->StimulationBoard_WR("u");
-	
+	pMainFrame->StimulationBoard_WR("u");	
 }
 
 void CDemoApp::OnAppXoff()
 {
+	pMainFrame->StimulationBoard_WR("x");	
 	//pMainFrame->stimulationBoard.setUV(FALSE);
-	pMainFrame->stimulationBoard.write("x\0", 2);
+	//pMainFrame->stimulationBoard.write("x\0", 2);
 }
 
 void CDemoApp::OnAppXon()
 {
+	pMainFrame->StimulationBoard_WR("X");	
 	//pMainFrame->stimulationBoard.setUV(FALSE);
-	pMainFrame->stimulationBoard.write("X\0", 2);
+	//pMainFrame->stimulationBoard.write("X\0", 2);
 }
 
 
 void CDemoApp::OnAppUvFlash()
 {
-	//pMainFrame->stimulationBoard.setUV(TRUE, TRUE);
-	pMainFrame->stimulationBoard.write("F\0", 2);
+	pMainFrame->StimulationBoard_WR("F");	
+	//pMainFrame->stimulationBoard.write("F\0", 2);
 }
 
 void CDemoApp::OnAppStimOn()
 {
-	pMainFrame->stimulationBoard.write("S\0", 2);
-	//CWnd* wnd = GetMessageBar();//get pointer to status bar
-	//wnd - &gt;
-	//SetWindowText("Running...");
+	pMainFrame->StimulationBoard_WR("S");	
+	//pMainFrame->stimulationBoard.write("S\0", 2);
 }
 
 void CDemoApp::OnAppStimOff()
 {
-	pMainFrame->stimulationBoard.write("s\0", 2);
+	pMainFrame->StimulationBoard_WR("s");	
+	//pMainFrame->stimulationBoard.write("s\0", 2);
 }
 
 void CDemoApp::OnAppStimPerm()
 {
-	pMainFrame->stimulationBoard.write("P\0", 2);
+	pMainFrame->StimulationBoard_WR("P");	
+	//pMainFrame->stimulationBoard.write("P\0", 2);
 }
 
 void CDemoApp::OnAppTrigOn()
 {
 	//pMainFrame->stimulationBoard.setTrigger(TRUE, FALSE);
-	pMainFrame->stimulationBoard.write("T\0", 2);
+	pMainFrame->StimulationBoard_WR("T");	
+	//pMainFrame->stimulationBoard.write("T\0", 2);
 }
 
 void CDemoApp::OnAppTrigOff()
 {
 	//pMainFrame->stimulationBoard.setTrigger(FALSE, FALSE);
-	pMainFrame->stimulationBoard.write("t\0", 2);
+	pMainFrame->StimulationBoard_WR("T");	
+	//pMainFrame->stimulationBoard.write("t\0", 2);
 }
 
 void CDemoApp::OnAppRR500()

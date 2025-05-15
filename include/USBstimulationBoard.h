@@ -63,7 +63,7 @@ public:
 
 	bool initialize();
 	int  RR(int rr); 
-	int  setStimulation(bool bOn = TRUE, bool bFreq=TRUE);
+	int  setStimulation(bool bOn = TRUE, bool bPerm=FALSE);
 	int  setUV(bool bOn=TRUE, bool bFlash = FALSE);
 	int  setTrigger(bool bOn = TRUE, bool bExt = TRUE);
 

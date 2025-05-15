@@ -22,7 +22,6 @@ class myPlot;
 
 // Following line is used for computer that has no pylon installed, to use a memory recorded file.
 
-#define MY_NO_pylon
 #define MY_NO_USB
 #define MY_NO_DB
 
@@ -31,7 +30,6 @@ class myPlot;
 
 #include "contractionDB.h"
 
-#ifndef MY_NO_pylon
 
 #include <pylon\PylonIncludes.h>
 //#include <pylon\AviCompressionOptions.h>
@@ -44,7 +42,6 @@ using namespace Basler_UsbCameraParams;
 using namespace Basler_UsbStreamParams;
 
 
-#endif // MY_NO_pylon
 
 // ---------------------------------------------------------------------------
 //
